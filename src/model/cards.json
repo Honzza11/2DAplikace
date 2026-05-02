@@ -1,0 +1,35 @@
+[
+  {
+    "id": "strike",
+    "name": "Strike",
+    "cost": 1,
+    "type": "ATTACK",
+    "description": "Deal 6 damage.",
+    "damage": 6
+  },
+  {
+    "id": "defend",
+    "name": "Defend",
+    "cost": 1,
+    "type": "SKILL",
+    "description": "Gain 5 Block.",
+    "block": 5
+  },
+  {
+    "id": "cinder_strike",
+    "name": "Cinder Strike",
+    "cost": 1,
+    "type": "ATTACK",
+    "description": "Deal 8 damage. Gain 2 Heat.",
+    "damage": 8,
+    "heat_gain": 2
+  },
+  {
+    "id": "soul_melody",
+    "name": "Soul Melody",
+    "cost": 1,
+    "type": "SKILL",
+    "description": "Gain 7 Block. Adds a Skill note.",
+    "block": 7
+  }
+]
