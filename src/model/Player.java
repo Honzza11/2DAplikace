@@ -26,6 +26,9 @@ public class Player extends Entity {
         resetBlock();
     }
 
+    public void onCardPlayed(Card card) {
+    }
+
     public boolean canAfford(Card card) {
         return energy >= card.getCost();
     }
