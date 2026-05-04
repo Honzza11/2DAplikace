@@ -31,5 +31,12 @@
     "type": "SKILL",
     "description": "Gain 7 Block. Adds a Skill note.",
     "block": 7
+  },
+  {
+    "id":"dangerous_note",
+    "name":"Dangerous Note",
+    "cost": 2,
+    "type":"ATTACK",
+    "description": "Deal 6 damage. Adds 2 Attack notes"
   }
 ]
