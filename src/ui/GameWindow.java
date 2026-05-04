@@ -48,12 +48,10 @@ public class GameWindow extends JFrame {
         menuPanel.add(playButton, gbc);
 
         JPanel charSelectPanel = createCharacterSelectPanel();
+        // Map Screen Container
+        JPanel mapContainer = new JPanel(new BorderLayout());
 
-        JPanel mapPanel = new JPanel(new GridBagLayout());
-        mapLabel = new JLabel("Map View");
-        mapLabel.setFont(new Font("Arial", Font.BOLD, 24));
-        mapPanel.add(mapLabel);
-
+        // Placeholder panels
         JPanel combatPanel = new JPanel(new GridBagLayout());
         combatLabel = new JLabel("Combat Screen");
         combatLabel.setFont(new Font("Arial", Font.BOLD, 24));
@@ -61,7 +59,7 @@ public class GameWindow extends JFrame {
 
         mainContainer.add(menuPanel, "MENU");
         mainContainer.add(charSelectPanel, "CHAR_SELECT");
-        mainContainer.add(mapPanel, "MAP");
+        mainContainer.add(mapContainer, "MAP");
         mainContainer.add(combatPanel, "COMBAT");
 
         add(mainContainer);
@@ -143,6 +141,38 @@ public class GameWindow extends JFrame {
         
         currentPlayer.setDeck(deck);
         System.out.println("Selected: " + type + ". Deck size: " + deck.size());
+        
+        generateAndShowMap();
+    }
+
+    private void generateAndShowMap() {
+        GameMap map = new GameMap(15, 4); // 15 tiers, max 4 columns
+        MapPanel mapPanel = new MapPanel(map);
+        
+        JScrollPane scrollPane = new JScrollPane(mapPanel);
+        scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+        scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        scrollPane.getVerticalScrollBar().setUnitIncrement(20);
+
+
+        SwingUtilities.invokeLater(() -> {
+            JScrollBar vertical = scrollPane.getVerticalScrollBar();
+            vertical.setValue(vertical.getMaximum());
+        });
+
+
+        for (Component c : mainContainer.getComponents()) {
+            if (c instanceof JPanel) {
+                JPanel p = (JPanel) c;
+                if (p.getLayout() instanceof BorderLayout && p.getComponentCount() == 0) {
+                    p.add(scrollPane, BorderLayout.CENTER);
+                    p.revalidate();
+                    p.repaint();
+                    break;
+                }
+            }
+        }
+        
         showScreen("MAP");
     }
 
