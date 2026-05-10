@@ -91,6 +91,12 @@ public class GameMap {
     private NodeType determineNodeType(int tier) {
         if (tier == 0) return NodeType.ENEMY; 
         if (tier == numTiers - 1) return NodeType.BOSS;
+        
+
+        if (tier == numTiers - 2) return NodeType.REST;
+        
+
+        if (tier == 4 || tier == 9) return NodeType.TREASURE;
 
         int rand = random.nextInt(100);
         if (rand < 40) return NodeType.ENEMY;

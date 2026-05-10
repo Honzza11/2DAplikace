@@ -18,8 +18,8 @@ public class GameWindow extends JFrame {
     public GameWindow() {
         setTitle("Kill the Pyre");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setSize(1280, 720);
-        setLocationRelativeTo(null); // Center on screen
+        setSize(1920, 1080);
+        setLocationRelativeTo(null);
 
         cardLayout = new CardLayout();
         mainContainer = new JPanel(cardLayout);
@@ -48,10 +48,9 @@ public class GameWindow extends JFrame {
         menuPanel.add(playButton, gbc);
 
         JPanel charSelectPanel = createCharacterSelectPanel();
-        // Map Screen Container
+
         JPanel mapContainer = new JPanel(new BorderLayout());
 
-        // Placeholder panels
         JPanel combatPanel = new JPanel(new GridBagLayout());
         combatLabel = new JLabel("Combat Screen");
         combatLabel.setFont(new Font("Arial", Font.BOLD, 24));
@@ -154,17 +153,23 @@ public class GameWindow extends JFrame {
         scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         scrollPane.getVerticalScrollBar().setUnitIncrement(20);
 
+        JPanel mapControls = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        mapControls.setBackground(new Color(240, 218, 181)); // Match parchment
+        JButton legendBtn = new JButton("Show Legend");
+        legendBtn.setFocusPainted(false);
+        legendBtn.addActionListener(e -> showLegendDialog());
+        mapControls.add(legendBtn);
 
         SwingUtilities.invokeLater(() -> {
             JScrollBar vertical = scrollPane.getVerticalScrollBar();
             vertical.setValue(vertical.getMaximum());
         });
 
-
         for (Component c : mainContainer.getComponents()) {
             if (c instanceof JPanel) {
                 JPanel p = (JPanel) c;
                 if (p.getLayout() instanceof BorderLayout && p.getComponentCount() == 0) {
+                    p.add(mapControls, BorderLayout.NORTH);
                     p.add(scrollPane, BorderLayout.CENTER);
                     p.revalidate();
                     p.repaint();
@@ -174,6 +179,15 @@ public class GameWindow extends JFrame {
         }
         
         showScreen("MAP");
+    }
+
+    private void showLegendDialog() {
+        JDialog dialog = new JDialog(this, "Map Legend", false); // Non-modal
+        dialog.add(new MapLegendPanel());
+        dialog.pack();
+        dialog.setLocationRelativeTo(this);
+        dialog.setResizable(false);
+        dialog.setVisible(true);
     }
 
     private void addCardsToDeck(List<Card> deck, List<Card> allCards, String name, int count) {

@@ -6,5 +6,6 @@ public enum NodeType {
     SHOP,
     ELITE,
     REST,
+    TREASURE,
     BOSS
 }
