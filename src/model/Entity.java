@@ -36,7 +36,9 @@ public abstract class Entity {
 
     public String getName() { return name; }
     public int getHp() { return hp; }
+    public int getHealth() { return hp; }
     public int getMaxHp() { return maxHp; }
+    public int getMaxHealth() { return maxHp; }
     public int getBlock() { return block; }
     public boolean isDead() { return hp <= 0; }
 }

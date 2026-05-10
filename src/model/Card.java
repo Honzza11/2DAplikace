@@ -52,6 +52,7 @@ public class Card {
 
     public String getName() { return name; }
     public int getCost() { return cost; }
+    public int getEnergyCost() { return cost; }
     public String getDescription() { return description; }
     public CardType getType() { return type; }
 

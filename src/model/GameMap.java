@@ -9,6 +9,7 @@ public class GameMap {
     private int numTiers;
     private int maxColumns;
     private Random random;
+    private MapNode currentNode;
 
     public GameMap(int numTiers, int maxColumns) {
         this.numTiers = numTiers;
@@ -108,5 +109,23 @@ public class GameMap {
 
     public List<List<MapNode>> getTiers() {
         return tiers;
+    }
+
+    public MapNode getCurrentNode() {
+        return currentNode;
+    }
+
+    public void setCurrentNode(MapNode node) {
+        this.currentNode = node;
+        if (node != null) node.setVisited(true);
+    }
+
+    public boolean isNodeSelectable(MapNode node) {
+
+        if (currentNode == null) {
+            return node.getTier() == 0;
+        }
+
+        return currentNode.getNextNodes().contains(node);
     }
 }

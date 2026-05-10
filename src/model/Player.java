@@ -31,7 +31,7 @@ public class Player extends Entity {
     public void drawCards(int amount) {
         for (int i = 0; i < amount; i++) {
             if (deck.isEmpty()) {
-                if (discardPile.isEmpty()) break; // No more cards anywhere
+                if (discardPile.isEmpty()) break;
                 shuffleDiscardIntoDeck();
             }
             hand.add(deck.remove(0));
@@ -67,7 +67,7 @@ public class Player extends Entity {
     }
 
     public void onCardPlayed(Card card) {
-        // To be overridden by subclasses
+
     }
 
     public boolean canAfford(Card card) {
@@ -83,7 +83,16 @@ public class Player extends Entity {
         Collections.shuffle(this.deck);
     }
 
+    public void shuffleDeck() {
+        Collections.shuffle(deck);
+    }
+
+    public void setEnergy(int energy) {
+        this.energy = energy;
+    }
+
     public int getEnergy() { return energy; }
+    public int getMaxEnergy() { return maxEnergy; }
     public List<Card> getDeck() { return deck; }
     public List<Card> getHand() { return hand; }
     public List<Card> getDiscardPile() { return discardPile; }

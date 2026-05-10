@@ -9,6 +9,7 @@ import java.util.List;
 public class GameWindow extends JFrame {
     private CardLayout cardLayout;
     private JPanel mainContainer;
+    private GameMap currentMap;
 
     private JLabel mapLabel;
     private JLabel combatLabel;
@@ -145,8 +146,8 @@ public class GameWindow extends JFrame {
     }
 
     private void generateAndShowMap() {
-        GameMap map = new GameMap(15, 4); // 15 tiers, max 4 columns
-        MapPanel mapPanel = new MapPanel(map);
+        this.currentMap = new GameMap(15, 4); 
+        MapPanel mapPanel = new MapPanel(this, currentMap);
         
         JScrollPane scrollPane = new JScrollPane(mapPanel);
         scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
@@ -179,6 +180,46 @@ public class GameWindow extends JFrame {
         }
         
         showScreen("MAP");
+    }
+
+    public void startCombat(Enemy enemy) {
+
+        currentPlayer.getHand().clear();
+        currentPlayer.getDiscardPile().clear();
+        currentPlayer.shuffleDeck();
+        currentPlayer.drawCards(5);
+        currentPlayer.setEnergy(currentPlayer.getMaxEnergy());
+
+        CombatPanel combatPanel = new CombatPanel(this, currentPlayer, enemy);
+        mainContainer.add(combatPanel, "COMBAT");
+        
+        showScreen("COMBAT");
+    }
+
+    public void showMapDialog() {
+        if (currentMap == null) return;
+        
+        JDialog dialog = new JDialog(this, "World Map", false);
+        MapPanel mapPanel = new MapPanel(this, currentMap);
+        JScrollPane scrollPane = new JScrollPane(mapPanel);
+        scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+        scrollPane.getVerticalScrollBar().setUnitIncrement(20);
+        
+        dialog.add(scrollPane);
+        dialog.setSize(1000, 800);
+        dialog.setLocationRelativeTo(this);
+        dialog.setVisible(true);
+
+
+        SwingUtilities.invokeLater(() -> {
+            JScrollBar vertical = scrollPane.getVerticalScrollBar();
+            vertical.setValue(vertical.getMaximum());
+            
+            JScrollBar horizontal = scrollPane.getHorizontalScrollBar();
+            int max = horizontal.getMaximum();
+            int extent = horizontal.getModel().getExtent();
+            horizontal.setValue((max - extent) / 2); // Center it
+        });
     }
 
     private void showLegendDialog() {

@@ -9,6 +9,7 @@ public class MapNode {
     private int tier;
     private int column;
     private List<MapNode> nextNodes;
+    private boolean visited = false;
 
     private int uiX;
     private int uiY;
@@ -32,6 +33,8 @@ public class MapNode {
     public int getTier() { return tier; }
     public int getColumn() { return column; }
     public List<MapNode> getNextNodes() { return nextNodes; }
+    public boolean isVisited() { return visited; }
+    public void setVisited(boolean visited) { this.visited = visited; }
 
     public int getUiX() { return uiX; }
     public void setUiX(int uiX) { this.uiX = uiX; }

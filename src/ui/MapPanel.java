@@ -3,6 +3,7 @@ package ui;
 import model.GameMap;
 import model.MapNode;
 import model.NodeType;
+import model.Enemy;
 
 import javax.swing.*;
 import java.awt.*;
@@ -12,11 +13,13 @@ import java.util.List;
 
 public class MapPanel extends JPanel {
     private GameMap gameMap;
+    private GameWindow gameWindow;
     private static final int NODE_SIZE = 50;
     private static final int TIER_HEIGHT = 120;
     private static final int COL_WIDTH = 150;
 
-    public MapPanel(GameMap map) {
+    public MapPanel(GameWindow gameWindow, GameMap map) {
+        this.gameWindow = gameWindow;
         this.gameMap = map;
         setLayout(null);
         setBackground(new Color(240, 218, 181)); // Parchment color
@@ -107,8 +110,19 @@ public class MapPanel extends JPanel {
             addMouseListener(new MouseAdapter() {
                 @Override
                 public void mouseClicked(MouseEvent e) {
-                    System.out.println("Clicked on " + node.getType() + " at tier " + node.getTier());
+                    if (gameMap.isNodeSelectable(node)) {
+                        gameMap.setCurrentNode(node);
+                        System.out.println("Moving to " + node.getType() + " at tier " + node.getTier());
+                        getParent().repaint();
+                        
 
+                        if (node.getType() == NodeType.ENEMY || node.getType() == NodeType.ELITE) {
+                            Enemy enemy = new Enemy("Slime", 50);
+                            gameWindow.startCombat(enemy);
+                        }
+                    } else {
+                        System.out.println("Node not reachable!");
+                    }
                 }
             });
         }
@@ -118,32 +132,59 @@ public class MapPanel extends JPanel {
             Graphics2D g2 = (Graphics2D) g;
             g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
             
-            g2.setColor(Color.DARK_GRAY);
+            boolean isSelectable = gameMap.isNodeSelectable(node);
+            boolean isVisited = node.isVisited();
+            
+
+            if (isVisited) {
+                g2.setColor(new Color(100, 80, 40));
+            } else if (isSelectable) {
+                g2.setColor(new Color(60, 60, 60));
+            } else {
+                g2.setColor(new Color(40, 40, 40, 150));
+            }
             g2.fillOval(0, 0, getWidth(), getHeight());
             
-            g2.setColor(Color.ORANGE);
-            g2.setStroke(new BasicStroke(2));
+
+            if (isSelectable) {
+                g2.setColor(Color.ORANGE);
+                g2.setStroke(new BasicStroke(3));
+            } else if (isVisited) {
+                g2.setColor(new Color(255, 215, 0));
+                g2.setStroke(new BasicStroke(2));
+            } else {
+                g2.setColor(new Color(80, 80, 80));
+                g2.setStroke(new BasicStroke(1));
+            }
             g2.drawOval(1, 1, getWidth() - 3, getHeight() - 3);
 
-            g2.setColor(Color.WHITE);
+
+            if (isSelectable || isVisited) {
+                g2.setColor(Color.WHITE);
+            } else {
+                g2.setColor(new Color(200, 200, 200, 100));
+            }
+
             int fontSize = (node.getType() == NodeType.BOSS) ? 45 : 25;
             g2.setFont(new Font("Segoe UI Emoji", Font.PLAIN, fontSize));
             
             String symbol = getSymbolForType(node.getType());
             FontMetrics fm = g2.getFontMetrics();
-            
-
             int tx = (getWidth() - fm.stringWidth(symbol)) / 2;
-            
-
             int ty = (getHeight() / 2) + (fm.getAscent() - fm.getDescent()) / 2;
             
-
             if (node.getType() == NodeType.BOSS) {
                 ty += 2; 
             }
 
             g2.drawString(symbol, tx, ty);
+            
+
+            if (isVisited) {
+                g2.setColor(Color.GREEN);
+                g2.setFont(new Font("Arial", Font.BOLD, 15));
+                g2.drawString("", 5, 15);
+            }
         }
 
         private String getSymbolForType(NodeType type) {
