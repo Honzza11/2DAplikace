@@ -41,11 +41,52 @@ public class CombatPanel extends JPanel {
         createButtons();
         
 
+        addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
+            public void mouseClicked(java.awt.event.MouseEvent e) {
+                handleCardClick(e.getX(), e.getY());
+            }
+        });
+
+
         addComponentListener(new java.awt.event.ComponentAdapter() {
             public void componentResized(java.awt.event.ComponentEvent e) {
                 updateLayout();
             }
         });
+    }
+
+    private void handleCardClick(int mouseX, int mouseY) {
+        int w = getWidth();
+        int h = getHeight();
+        int handSize = hand.size();
+        if (handSize == 0) return;
+
+        int totalHandWidth = handSize * (CARD_WIDTH + 15);
+        int startX = (w - totalHandWidth) / 2;
+        int handY = h - 200;
+
+
+        for (int i = 0; i < handSize; i++) {
+            int cardX = startX + i * (CARD_WIDTH + 15);
+            if (mouseX >= cardX && mouseX <= cardX + CARD_WIDTH &&
+                mouseY >= handY && mouseY <= handY + CARD_HEIGHT) {
+                
+                Card card = hand.get(i);
+
+                if (player.playCard(card, enemy)) {
+                    System.out.println("Played: " + card.getName());
+                    repaint();
+                    
+
+                    if (enemy.isDead()) {
+                        System.out.println("Enemy defeated!");
+
+                    }
+                }
+                break;
+            }
+        }
     }
 
     private void createButtons() {
@@ -59,7 +100,19 @@ public class CombatPanel extends JPanel {
         endTurnBtn.setBackground(new Color(150, 50, 50));
         endTurnBtn.setForeground(Color.WHITE);
         endTurnBtn.setFocusPainted(false);
-        endTurnBtn.addActionListener(e -> System.out.println("End Turn Clicked"));
+        endTurnBtn.addActionListener(e -> {
+
+            player.discardHand();
+            
+
+            if (enemy != null && !enemy.isDead()) {
+                enemy.takeTurn(player);
+            }
+
+            player.startTurn();
+            
+            repaint();
+        });
         add(endTurnBtn);
     }
 
@@ -123,6 +176,13 @@ public class CombatPanel extends JPanel {
         g2.setColor(Color.WHITE);
         g2.setFont(new Font("Arial", Font.BOLD, 24));
         g2.drawString(name, x + 20, y - 60);
+        
+
+        if (enemy != null && name.equals(enemy.getName())) {
+            g2.setColor(new Color(255, 200, 0));
+            g2.setFont(new Font("Arial", Font.ITALIC, 18));
+            g2.drawString("Intent: " + enemy.getIntentDescription(), x + 20, y - 90);
+        }
         
         int barWidth = 200;
         int barHeight = 20;
