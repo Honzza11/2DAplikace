@@ -14,34 +14,55 @@ import java.util.List;
 public class MapPanel extends JPanel {
     private GameMap gameMap;
     private GameWindow gameWindow;
+    private boolean interactive = true;
     private static final int NODE_SIZE = 50;
     private static final int TIER_HEIGHT = 120;
     private static final int COL_WIDTH = 150;
 
     public MapPanel(GameWindow gameWindow, GameMap map) {
+        this(gameWindow, map, true);
+    }
+
+    public MapPanel(GameWindow gameWindow, GameMap map, boolean interactive) {
         this.gameWindow = gameWindow;
         this.gameMap = map;
+        this.interactive = interactive;
         setLayout(null);
         setBackground(new Color(240, 218, 181)); // Parchment color
 
         int numTiers = map.getTiers().size();
         int panelHeight = numTiers * TIER_HEIGHT + 100;
-        setPreferredSize(new Dimension(1920, panelHeight));
+        setPreferredSize(new Dimension(1920, panelHeight)); // Base width, will center relative to actual width
 
         calculateNodePositions(panelHeight);
         addNodeButtons();
+
+
+        addComponentListener(new java.awt.event.ComponentAdapter() {
+            @Override
+            public void componentResized(java.awt.event.ComponentEvent e) {
+                calculateNodePositions(getHeight());
+                for (Component c : getComponents()) {
+                    if (c instanceof NodeButton) {
+                        MapNode node = ((NodeButton) c).node;
+                        c.setBounds(node.getX(), node.getY(), NODE_SIZE, NODE_SIZE);
+                    }
+                }
+                repaint();
+            }
+        });
     }
 
     private void calculateNodePositions(int panelHeight) {
         List<List<MapNode>> tiers = gameMap.getTiers();
+        int currentWidth = Math.max(1600, getWidth()); // Ensure a minimum width for centering
+        
         for (int t = 0; t < tiers.size(); t++) {
             List<MapNode> tier = tiers.get(t);
-
             int y = panelHeight - 100 - (t * TIER_HEIGHT);
             
-
             int totalWidth = tier.size() * COL_WIDTH;
-            int startX = (1920 - totalWidth) / 2 + (COL_WIDTH / 2) - (NODE_SIZE / 2);
+            int startX = (currentWidth - totalWidth) / 2 + (COL_WIDTH / 2) - (NODE_SIZE / 2);
 
             for (int c = 0; c < tier.size(); c++) {
                 MapNode node = tier.get(c);
@@ -78,13 +99,10 @@ public class MapPanel extends JPanel {
         Graphics2D g2 = (Graphics2D) g;
         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
-        drawPaths(g2);
-    }
-
-    private void drawPaths(Graphics2D g2) {
-        Stroke dashed = new BasicStroke(3, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL, 0, new float[]{9}, 0);
-        g2.setStroke(dashed);
-        g2.setColor(new Color(100, 100, 100, 150));
+        int currentWidth = Math.max(1600, getWidth());
+        
+        g2.setColor(new Color(100, 70, 40, 150));
+        g2.setStroke(new BasicStroke(2, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND, 1, new float[]{10}, 0));
 
         for (List<MapNode> tier : gameMap.getTiers()) {
             for (MapNode node : tier) {
@@ -106,8 +124,9 @@ public class MapPanel extends JPanel {
 
         public NodeButton(MapNode node) {
             this.node = node;
-            setCursor(new Cursor(Cursor.HAND_CURSOR));
-            addMouseListener(new MouseAdapter() {
+            if (interactive) {
+                setCursor(new Cursor(Cursor.HAND_CURSOR));
+                addMouseListener(new MouseAdapter() {
                 @Override
                 public void mouseClicked(MouseEvent e) {
                     if (gameMap.isNodeSelectable(node)) {
@@ -125,6 +144,7 @@ public class MapPanel extends JPanel {
                     }
                 }
             });
+            }
         }
 
         @Override

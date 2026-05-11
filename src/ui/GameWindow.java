@@ -19,7 +19,8 @@ public class GameWindow extends JFrame {
     public GameWindow() {
         setTitle("Kill the Pyre");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setSize(1920, 1080);
+        setExtendedState(JFrame.MAXIMIZED_BOTH); // Start maximized
+        setResizable(true);
         setLocationRelativeTo(null);
 
         cardLayout = new CardLayout();
@@ -200,7 +201,7 @@ public class GameWindow extends JFrame {
         if (currentMap == null) return;
         
         JDialog dialog = new JDialog(this, "World Map", false);
-        MapPanel mapPanel = new MapPanel(this, currentMap);
+        MapPanel mapPanel = new MapPanel(this, currentMap, false);
         JScrollPane scrollPane = new JScrollPane(mapPanel);
         scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
         scrollPane.getVerticalScrollBar().setUnitIncrement(20);

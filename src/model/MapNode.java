@@ -37,7 +37,9 @@ public class MapNode {
     public void setVisited(boolean visited) { this.visited = visited; }
 
     public int getUiX() { return uiX; }
+    public int getX() { return uiX; } // Alias for UI
     public void setUiX(int uiX) { this.uiX = uiX; }
     public int getUiY() { return uiY; }
+    public int getY() { return uiY; } // Alias for UI
     public void setUiY(int uiY) { this.uiY = uiY; }
 }

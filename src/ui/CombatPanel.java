@@ -19,7 +19,8 @@ public class CombatPanel extends JPanel {
 
     private static final int CARD_WIDTH = 120;
     private static final int CARD_HEIGHT = 170;
-    private static final int HAND_Y = 850;
+    private JButton endTurnBtn;
+    private JButton viewMapBtn;
 
     public CombatPanel(GameWindow gameWindow, Player player, Enemy enemy) {
         this.gameWindow = gameWindow;
@@ -37,29 +38,39 @@ public class CombatPanel extends JPanel {
         setLayout(null);
         setBackground(new Color(30, 30, 30)); 
         
-        addEndTurnButton();
-        addViewMapButton();
+        createButtons();
+        
+
+        addComponentListener(new java.awt.event.ComponentAdapter() {
+            public void componentResized(java.awt.event.ComponentEvent e) {
+                updateLayout();
+            }
+        });
     }
 
-    private void addViewMapButton() {
-        JButton viewMapBtn = new JButton("VIEW MAP");
-        viewMapBtn.setBounds(1720, 20, 150, 40);
+    private void createButtons() {
+        viewMapBtn = new JButton("VIEW MAP");
         viewMapBtn.setFocusPainted(false);
         viewMapBtn.addActionListener(e -> gameWindow.showMapDialog());
         add(viewMapBtn);
-    }
 
-    private void addEndTurnButton() {
-        JButton endTurnBtn = new JButton("END TURN");
-        endTurnBtn.setBounds(1650, 800, 150, 60);
+        endTurnBtn = new JButton("END TURN");
         endTurnBtn.setFont(new Font("Arial", Font.BOLD, 20));
         endTurnBtn.setBackground(new Color(150, 50, 50));
         endTurnBtn.setForeground(Color.WHITE);
         endTurnBtn.setFocusPainted(false);
-        endTurnBtn.addActionListener(e -> {
-            System.out.println("End Turn Clicked");
-        });
+        endTurnBtn.addActionListener(e -> System.out.println("End Turn Clicked"));
         add(endTurnBtn);
+    }
+
+    private void updateLayout() {
+        int w = getWidth();
+        int h = getHeight();
+        if (w <= 0 || h <= 0) return;
+
+        viewMapBtn.setBounds(w - 180, 20, 150, 40);
+        endTurnBtn.setBounds(w - 200, h - 150, 150, 60);
+        repaint();
     }
 
     @Override
@@ -75,50 +86,47 @@ public class CombatPanel extends JPanel {
     }
 
     private void drawBackground(Graphics2D g2) {
+        int w = getWidth();
+        int h = getHeight();
+        
         if (backgroundImage != null) {
-            g2.drawImage(backgroundImage, 0, 0, 1920, 1080, null);
-
+            g2.drawImage(backgroundImage, 0, 0, w, h, null);
             g2.setColor(new Color(0, 0, 0, 50));
-            g2.fillRect(0, 0, 1920, 1080);
+            g2.fillRect(0, 0, w, h);
         } else {
-
-            GradientPaint gp = new GradientPaint(0, 0, new Color(40, 20, 20), 0, 1080, new Color(10, 10, 10));
+            GradientPaint gp = new GradientPaint(0, 0, new Color(40, 20, 20), 0, h, new Color(10, 10, 10));
             g2.setPaint(gp);
-            g2.fillRect(0, 0, 1920, 1080);
+            g2.fillRect(0, 0, w, h);
         }
         
-
         g2.setColor(new Color(0, 0, 0, 80));
-        g2.fillRect(0, 750, 1920, 330); 
+        g2.fillRect(0, h - 250, w, 250); 
     }
 
     private void drawEntities(Graphics2D g2) {
+        int w = getWidth();
+        int h = getHeight();
+        
 
-        drawEntity(g2, player.getName(), 300, 450, player.getHealth(), player.getMaxHealth(), Color.CYAN);
+        drawEntity(g2, player.getName(), (int)(w * 0.2) - 75, h - 550, player.getHealth(), player.getMaxHealth(), Color.CYAN);
         
 
         if (enemy != null) {
-            drawEntity(g2, enemy.getName(), 1400, 450, enemy.getHealth(), enemy.getMaxHealth(), Color.RED);
+            drawEntity(g2, enemy.getName(), (int)(w * 0.8) - 75, h - 550, enemy.getHealth(), enemy.getMaxHealth(), Color.RED);
         }
     }
 
-    private void drawEntity(Graphics2D g2, String name, int x, int y, int hp, int maxHp, int color) {
-
-    }
-    
     private void drawEntity(Graphics2D g2, String name, int x, int y, int hp, int maxHp, Color color) {
-
         g2.setColor(color);
         g2.fillOval(x, y, 150, 250);
         
-
         g2.setColor(Color.WHITE);
         g2.setFont(new Font("Arial", Font.BOLD, 24));
         g2.drawString(name, x + 20, y - 60);
-
+        
         int barWidth = 200;
         int barHeight = 20;
-        int healthWidth = (int) ((double) hp / maxHp * barWidth);
+        int healthWidth = (int) ((double) hp / Math.max(1, maxHp) * barWidth);
         
         g2.setColor(Color.GRAY);
         g2.fillRect(x - 25, y - 40, barWidth, barHeight);
@@ -132,9 +140,13 @@ public class CombatPanel extends JPanel {
     }
 
     private void drawHand(Graphics2D g2) {
-        int startX = (1920 - (hand.size() * (CARD_WIDTH + 10))) / 2;
+        int w = getWidth();
+        int h = getHeight();
+        int startX = (w - (hand.size() * (CARD_WIDTH + 15))) / 2;
+        int handY = h - 200;
+        
         for (int i = 0; i < hand.size(); i++) {
-            drawCard(g2, hand.get(i), startX + i * (CARD_WIDTH + 15), HAND_Y);
+            drawCard(g2, hand.get(i), startX + i * (CARD_WIDTH + 15), handY);
         }
     }
 
@@ -155,17 +167,20 @@ public class CombatPanel extends JPanel {
     }
 
     private void drawUIOverlay(Graphics2D g2) {
+        int w = getWidth();
+        int h = getHeight();
+        
 
         g2.setColor(Color.ORANGE);
-        g2.fillOval(50, 850, 100, 100);
+        g2.fillOval(50, h - 200, 100, 100);
         g2.setColor(Color.BLACK);
         g2.setFont(new Font("Arial", Font.BOLD, 40));
-        g2.drawString(player.getEnergy() + "/" + player.getMaxEnergy(), 65, 915);
+        g2.drawString(player.getEnergy() + "/" + player.getMaxEnergy(), 65, h - 135);
         
 
         g2.setColor(Color.WHITE);
         g2.setFont(new Font("Arial", Font.BOLD, 18));
-        g2.drawString("Draw: " + player.getDeck().size(), 50, 820);
-        g2.drawString("Discard: " + player.getDiscardPile().size(), 50, 980);
+        g2.drawString("Draw: " + player.getDeck().size(), 50, h - 230);
+        g2.drawString("Discard: " + player.getDiscardPile().size(), 50, h - 70);
     }
 }
