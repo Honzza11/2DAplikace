@@ -59,12 +59,14 @@ public class CombatPanel extends JPanel {
     private void handleCardClick(int mouseX, int mouseY) {
         int w = getWidth();
         int h = getHeight();
+        int uiStartY = (int)(h * 0.7);
+        int uiHeight = (int)(h * 0.3);
         int handSize = hand.size();
         if (handSize == 0) return;
 
         int totalHandWidth = handSize * (CARD_WIDTH + 15);
         int startX = (w - totalHandWidth) / 2;
-        int handY = h - 200;
+        int handY = uiStartY + (uiHeight - CARD_HEIGHT) / 2;
 
 
         for (int i = 0; i < handSize; i++) {
@@ -120,9 +122,10 @@ public class CombatPanel extends JPanel {
         int w = getWidth();
         int h = getHeight();
         if (w <= 0 || h <= 0) return;
+        int battleHeight = (int)(h * 0.7);
 
         viewMapBtn.setBounds(w - 180, 20, 150, 40);
-        endTurnBtn.setBounds(w - 200, h - 150, 150, 60);
+        endTurnBtn.setBounds(w - 200, h - 100, 150, 60);
         repaint();
     }
 
@@ -141,31 +144,43 @@ public class CombatPanel extends JPanel {
     private void drawBackground(Graphics2D g2) {
         int w = getWidth();
         int h = getHeight();
+        int uiHeight = (int)(h * 0.3); // Bottom 30% for UI
+        int battleHeight = h - uiHeight;
         
+
         if (backgroundImage != null) {
-            g2.drawImage(backgroundImage, 0, 0, w, h, null);
-            g2.setColor(new Color(0, 0, 0, 50));
-            g2.fillRect(0, 0, w, h);
+
+            g2.drawImage(backgroundImage, 0, 0, w, battleHeight, null);
+
+            g2.setColor(new Color(0, 0, 0, 40));
+            g2.fillRect(0, 0, w, battleHeight);
         } else {
-            GradientPaint gp = new GradientPaint(0, 0, new Color(40, 20, 20), 0, h, new Color(10, 10, 10));
+            GradientPaint gp = new GradientPaint(0, 0, new Color(40, 20, 20), 0, battleHeight, new Color(10, 10, 10));
             g2.setPaint(gp);
-            g2.fillRect(0, 0, w, h);
+            g2.fillRect(0, 0, w, battleHeight);
         }
         
-        g2.setColor(new Color(0, 0, 0, 80));
-        g2.fillRect(0, h - 250, w, 250); 
+
+        g2.setColor(Color.BLACK);
+        g2.fillRect(0, battleHeight, w, uiHeight);
+        
+
+        g2.setColor(new Color(80, 80, 80));
+        g2.setStroke(new BasicStroke(3));
+        g2.drawLine(0, battleHeight, w, battleHeight);
     }
 
     private void drawEntities(Graphics2D g2) {
         int w = getWidth();
         int h = getHeight();
+        int battleHeight = (int)(h * 0.7);
         
 
-        drawEntity(g2, player.getName(), (int)(w * 0.2) - 75, h - 550, player.getHealth(), player.getMaxHealth(), Color.CYAN);
+        drawEntity(g2, player.getName(), (int)(w * 0.2) - 75, battleHeight - 320, player.getHealth(), player.getMaxHealth(), Color.CYAN);
         
 
         if (enemy != null) {
-            drawEntity(g2, enemy.getName(), (int)(w * 0.8) - 75, h - 550, enemy.getHealth(), enemy.getMaxHealth(), Color.RED);
+            drawEntity(g2, enemy.getName(), (int)(w * 0.8) - 75, battleHeight - 320, enemy.getHealth(), enemy.getMaxHealth(), Color.RED);
         }
     }
 
@@ -202,8 +217,12 @@ public class CombatPanel extends JPanel {
     private void drawHand(Graphics2D g2) {
         int w = getWidth();
         int h = getHeight();
-        int startX = (w - (hand.size() * (CARD_WIDTH + 15))) / 2;
-        int handY = h - 200;
+        int uiStartY = (int)(h * 0.7);
+        int uiHeight = (int)(h * 0.3);
+        
+        int totalHandWidth = hand.size() * (CARD_WIDTH + 15);
+        int startX = (w - totalHandWidth) / 2;
+        int handY = uiStartY + (uiHeight - CARD_HEIGHT) / 2;
         
         for (int i = 0; i < hand.size(); i++) {
             drawCard(g2, hand.get(i), startX + i * (CARD_WIDTH + 15), handY);
@@ -229,18 +248,19 @@ public class CombatPanel extends JPanel {
     private void drawUIOverlay(Graphics2D g2) {
         int w = getWidth();
         int h = getHeight();
+        int uiStartY = (int)(h * 0.7);
+        int uiHeight = (int)(h * 0.3);
         
 
         g2.setColor(Color.ORANGE);
-        g2.fillOval(50, h - 200, 100, 100);
+        g2.fillOval(50, uiStartY + (uiHeight - 100) / 2, 100, 100);
         g2.setColor(Color.BLACK);
         g2.setFont(new Font("Arial", Font.BOLD, 40));
-        g2.drawString(player.getEnergy() + "/" + player.getMaxEnergy(), 65, h - 135);
-        
+        g2.drawString(player.getEnergy() + "/" + player.getMaxEnergy(), 65, uiStartY + (uiHeight + 25) / 2);
 
         g2.setColor(Color.WHITE);
         g2.setFont(new Font("Arial", Font.BOLD, 18));
-        g2.drawString("Draw: " + player.getDeck().size(), 50, h - 230);
-        g2.drawString("Discard: " + player.getDiscardPile().size(), 50, h - 70);
+        g2.drawString("Draw: " + player.getDeck().size(), 50, uiStartY + 30);
+        g2.drawString("Discard: " + player.getDiscardPile().size(), 50, h - 30);
     }
 }

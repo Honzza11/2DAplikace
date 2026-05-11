@@ -73,7 +73,6 @@ public class CardLoader {
         if (end == -1) end = data.length();
 
         String val = data.substring(start, end).trim();
-        // Remove quotes if string
         if (val.startsWith("\"") && val.endsWith("\"")) {
             val = val.substring(1, val.length() - 1);
         }
