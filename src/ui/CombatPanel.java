@@ -176,22 +176,22 @@ public class CombatPanel extends JPanel {
         int battleHeight = (int)(h * 0.7);
         
 
-        drawEntity(g2, player.getName(), (int)(w * 0.2) - 75, battleHeight - 320, player.getHealth(), player.getMaxHealth(), Color.CYAN);
+        drawEntity(g2, player.getName(), (int)(w * 0.2) - 75, battleHeight - 320, player.getHealth(), player.getMaxHealth(), player.getBlock(), Color.CYAN);
         
 
         if (enemy != null) {
-            drawEntity(g2, enemy.getName(), (int)(w * 0.8) - 75, battleHeight - 320, enemy.getHealth(), enemy.getMaxHealth(), Color.RED);
+            drawEntity(g2, enemy.getName(), (int)(w * 0.8) - 75, battleHeight - 320, enemy.getHealth(), enemy.getMaxHealth(), enemy.getBlock(), Color.RED);
         }
     }
 
-    private void drawEntity(Graphics2D g2, String name, int x, int y, int hp, int maxHp, Color color) {
+    private void drawEntity(Graphics2D g2, String name, int x, int y, int hp, int maxHp, int block, Color color) {
         g2.setColor(color);
         g2.fillOval(x, y, 150, 250);
         
         g2.setColor(Color.WHITE);
         g2.setFont(new Font("Arial", Font.BOLD, 24));
         g2.drawString(name, x + 20, y - 60);
-        
+
 
         if (enemy != null && name.equals(enemy.getName())) {
             g2.setColor(new Color(255, 200, 0));
@@ -212,6 +212,21 @@ public class CombatPanel extends JPanel {
         
         g2.setFont(new Font("Arial", Font.BOLD, 14));
         g2.drawString(hp + " / " + maxHp, x + 40, y - 25);
+
+
+        if (block > 0) {
+            g2.setColor(new Color(50, 150, 250));
+            g2.fillRoundRect(x - 58, y - 44, 28, 28, 6, 6);
+            g2.setColor(Color.WHITE);
+            g2.drawRoundRect(x - 58, y - 44, 28, 28, 6, 6);
+            g2.setFont(new Font("Arial", Font.BOLD, 13));
+            
+            String blockStr = String.valueOf(block);
+            FontMetrics fm = g2.getFontMetrics();
+            int textX = (x - 58) + (28 - fm.stringWidth(blockStr)) / 2;
+            int textY = (y - 44) + ((28 - fm.getHeight()) / 2) + fm.getAscent();
+            g2.drawString(blockStr, textX, textY);
+        }
     }
 
     private void drawHand(Graphics2D g2) {

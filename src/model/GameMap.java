@@ -101,9 +101,8 @@ public class GameMap {
 
         int rand = random.nextInt(100);
         if (rand < 40) return NodeType.ENEMY;
-        if (rand < 65) return NodeType.EVENT;
-        if (rand < 80) return NodeType.SHOP;
-        if (rand < 90) return NodeType.REST;
+        if (rand < 70) return NodeType.EVENT;
+        if (rand < 85) return NodeType.REST;
         return NodeType.ELITE;
     }
 

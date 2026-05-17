@@ -147,7 +147,7 @@ public class GameWindow extends JFrame {
     }
 
     private void generateAndShowMap() {
-        this.currentMap = new GameMap(15, 4); 
+        this.currentMap = new GameMap(8, 3);
         MapPanel mapPanel = new MapPanel(this, currentMap);
         
         JScrollPane scrollPane = new JScrollPane(mapPanel);
