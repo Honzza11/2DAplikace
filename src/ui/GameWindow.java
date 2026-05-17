@@ -82,7 +82,7 @@ public class GameWindow extends JFrame {
         heroesBox.setOpaque(false);
         
         heroesBox.add(createHeroOption("Ash Walker", "Aggressive & Risky. Uses Heat to deal massive damage.", "ASH_WALKER"));
-        heroesBox.add(createHeroOption("Singer", "Tactical & Defensive. Uses Chords to trigger powerful songs.", "SINGER"));
+        heroesBox.add(createHeroOption("Bard", "Tactical & Defensive. Uses Chords to trigger powerful songs.", "BARD"));
         
         gbc.gridy = 1;
         gbc.weighty = 1.0;
@@ -95,30 +95,53 @@ public class GameWindow extends JFrame {
 
     private JPanel createHeroOption(String name, String desc, String type) {
         JPanel panel = new JPanel(new BorderLayout(10, 10));
-        panel.setPreferredSize(new Dimension(300, 400));
+        panel.setPreferredSize(new Dimension(320, 480));
         panel.setBackground(new Color(20, 20, 20, 220));
         panel.setBorder(BorderFactory.createLineBorder(Color.ORANGE, 2));
 
         JLabel nameLabel = new JLabel(name, SwingConstants.CENTER);
         nameLabel.setFont(new Font("Arial", Font.BOLD, 28));
         nameLabel.setForeground(Color.WHITE);
-        nameLabel.setBorder(BorderFactory.createEmptyBorder(20, 0, 10, 0));
+        nameLabel.setBorder(BorderFactory.createEmptyBorder(10, 0, 5, 0));
         
+
+        String imagePath = type.equals("ASH_WALKER") ? "Res/assasin.png" : "Res/723-7239135_bard-png-transparent-png.png";
+        ImageIcon heroIcon = null;
+        try {
+            ImageIcon origIcon = new ImageIcon(imagePath);
+            Image img = origIcon.getImage();
+            Image scaledImg = img.getScaledInstance(120, 200, Image.SCALE_SMOOTH);
+            heroIcon = new ImageIcon(scaledImg);
+        } catch (Exception e) {
+            System.err.println("Could not load hero preview image: " + e.getMessage());
+        }
+
+        JPanel centerPanel = new JPanel(new BorderLayout(5, 5));
+        centerPanel.setOpaque(false);
+
+        if (heroIcon != null) {
+            JLabel imgLabel = new JLabel(heroIcon);
+            imgLabel.setHorizontalAlignment(SwingConstants.CENTER);
+            centerPanel.add(imgLabel, BorderLayout.NORTH);
+        }
+
         JTextArea descArea = new JTextArea(desc);
-        descArea.setFont(new Font("Arial", Font.PLAIN, 18));
+        descArea.setFont(new Font("Arial", Font.PLAIN, 16));
         descArea.setForeground(Color.LIGHT_GRAY);
         descArea.setBackground(new Color(0,0,0,0));
         descArea.setLineWrap(true);
         descArea.setWrapStyleWord(true);
         descArea.setEditable(false);
         descArea.setMargin(new Insets(10, 20, 10, 20));
+        
+        centerPanel.add(descArea, BorderLayout.CENTER);
 
         JButton selectBtn = new JButton("Select");
         selectBtn.setFont(new Font("Arial", Font.BOLD, 20));
         selectBtn.addActionListener(e -> selectCharacter(type));
         
         panel.add(nameLabel, BorderLayout.NORTH);
-        panel.add(descArea, BorderLayout.CENTER);
+        panel.add(centerPanel, BorderLayout.CENTER);
         panel.add(selectBtn, BorderLayout.SOUTH);
         
         return panel;
@@ -134,7 +157,7 @@ public class GameWindow extends JFrame {
             addCardsToDeck(deck, allCards, "Defend", 4);
             addCardsToDeck(deck, allCards, "Cinder Strike", 1);
         } else {
-            currentPlayer = new Singer("Singer", 70, 3);
+            currentPlayer = new Bard("Bard", 70, 3);
             addCardsToDeck(deck, allCards, "Strike", 5);
             addCardsToDeck(deck, allCards, "Defend", 4);
             addCardsToDeck(deck, allCards, "Soul Melody", 1);
@@ -147,7 +170,7 @@ public class GameWindow extends JFrame {
     }
 
     private void generateAndShowMap() {
-        this.currentMap = new GameMap(8, 3);
+        this.currentMap = new GameMap(7, 3);
         MapPanel mapPanel = new MapPanel(this, currentMap);
         
         JScrollPane scrollPane = new JScrollPane(mapPanel);

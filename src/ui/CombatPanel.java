@@ -1,8 +1,6 @@
 package ui;
 
-import model.Card;
-import model.Enemy;
-import model.Player;
+import model.*;
 
 import javax.swing.*;
 import java.awt.*;
@@ -14,6 +12,9 @@ public class CombatPanel extends JPanel {
     private Enemy enemy;
     private List<Card> hand;
     private Image backgroundImage;
+    private Image playerImage;
+    private Image enemyImage;
+    private Image energyOrbImage;
     private GameWindow gameWindow;
     
 
@@ -31,8 +32,20 @@ public class CombatPanel extends JPanel {
 
         try {
             backgroundImage = new ImageIcon("c:\\Users\\jenik\\IdeaProjects\\2D Aplikace-Killthepyre\\Res\\dungeon (1).jpg").getImage();
+            
+            if (player instanceof AshWalker) {
+                playerImage = new ImageIcon("Res/assasin.png").getImage();
+            } else if (player instanceof Bard) {
+                playerImage = new ImageIcon("Res/723-7239135_bard-png-transparent-png.png").getImage();
+            }
+            
+            if (enemy != null && enemy.getName().equalsIgnoreCase("Slime")) {
+                enemyImage = new ImageIcon("Res/slime (1).png").getImage();
+            }
+
+            energyOrbImage = new ImageIcon("Res/pngtree-red-energy-orb-png-image_19759672 (1).png").getImage();
         } catch (Exception e) {
-            System.err.println("Could not load background image: " + e.getMessage());
+            System.err.println("Could not load images: " + e.getMessage());
         }
 
         setLayout(null);
@@ -144,7 +157,7 @@ public class CombatPanel extends JPanel {
     private void drawBackground(Graphics2D g2) {
         int w = getWidth();
         int h = getHeight();
-        int uiHeight = (int)(h * 0.3); // Bottom 30% for UI
+        int uiHeight = (int)(h * 0.3); 
         int battleHeight = h - uiHeight;
         
 
@@ -176,27 +189,42 @@ public class CombatPanel extends JPanel {
         int battleHeight = (int)(h * 0.7);
         
 
-        drawEntity(g2, player.getName(), (int)(w * 0.2) - 75, battleHeight - 320, player.getHealth(), player.getMaxHealth(), player.getBlock(), Color.CYAN);
+        drawEntity(g2, player.getName(), (int)(w * 0.2) - 100, battleHeight - 370, player.getHealth(), player.getMaxHealth(), player.getBlock(), Color.CYAN);
         
 
         if (enemy != null) {
-            drawEntity(g2, enemy.getName(), (int)(w * 0.8) - 75, battleHeight - 320, enemy.getHealth(), enemy.getMaxHealth(), enemy.getBlock(), Color.RED);
+            drawEntity(g2, enemy.getName(), (int)(w * 0.8) - 100, battleHeight - 370, enemy.getHealth(), enemy.getMaxHealth(), enemy.getBlock(), Color.RED);
         }
     }
 
     private void drawEntity(Graphics2D g2, String name, int x, int y, int hp, int maxHp, int block, Color color) {
-        g2.setColor(color);
-        g2.fillOval(x, y, 150, 250);
+
+        g2.setColor(new Color(0, 0, 0, 100));
+        g2.fillOval(x - 15, y + 285, 230, 25);
+
+        if (playerImage != null && name.equals(player.getName())) {
+            g2.drawImage(playerImage, x, y, 200, 300, null);
+        } else if (enemyImage != null && enemy != null && name.equals(enemy.getName())) {
+            g2.drawImage(enemyImage, x, y, 200, 300, null);
+        } else {
+            g2.setColor(color);
+            g2.fillOval(x, y, 200, 300);
+        }
         
         g2.setColor(Color.WHITE);
         g2.setFont(new Font("Arial", Font.BOLD, 24));
-        g2.drawString(name, x + 20, y - 60);
+        FontMetrics fmEntity = g2.getFontMetrics();
+        int nameX = x + (200 - fmEntity.stringWidth(name)) / 2;
+        g2.drawString(name, nameX, y - 60);
 
 
         if (enemy != null && name.equals(enemy.getName())) {
             g2.setColor(new Color(255, 200, 0));
             g2.setFont(new Font("Arial", Font.ITALIC, 18));
-            g2.drawString("Intent: " + enemy.getIntentDescription(), x + 20, y - 90);
+            String intentStr = "Intent: " + enemy.getIntentDescription();
+            FontMetrics fmIntent = g2.getFontMetrics();
+            int intentX = x + (200 - fmIntent.stringWidth(intentStr)) / 2;
+            g2.drawString(intentStr, intentX, y - 90);
         }
         
         int barWidth = 200;
@@ -204,30 +232,34 @@ public class CombatPanel extends JPanel {
         int healthWidth = (int) ((double) hp / Math.max(1, maxHp) * barWidth);
         
         g2.setColor(Color.GRAY);
-        g2.fillRect(x - 25, y - 40, barWidth, barHeight);
+        g2.fillRect(x, y - 40, barWidth, barHeight);
         g2.setColor(Color.GREEN);
-        g2.fillRect(x - 25, y - 40, healthWidth, barHeight);
+        g2.fillRect(x, y - 40, healthWidth, barHeight);
         g2.setColor(Color.WHITE);
-        g2.drawRect(x - 25, y - 40, barWidth, barHeight);
+        g2.drawRect(x, y - 40, barWidth, barHeight);
         
         g2.setFont(new Font("Arial", Font.BOLD, 14));
-        g2.drawString(hp + " / " + maxHp, x + 40, y - 25);
+        String hpStr = hp + " / " + maxHp;
+        FontMetrics fmHp = g2.getFontMetrics();
+        int hpX = x + (barWidth - fmHp.stringWidth(hpStr)) / 2;
+        g2.drawString(hpStr, hpX, y - 25);
 
 
         if (block > 0) {
             g2.setColor(new Color(50, 150, 250));
-            g2.fillRoundRect(x - 58, y - 44, 28, 28, 6, 6);
+            g2.fillRoundRect(x - 33, y - 44, 28, 28, 6, 6);
             g2.setColor(Color.WHITE);
-            g2.drawRoundRect(x - 58, y - 44, 28, 28, 6, 6);
+            g2.drawRoundRect(x - 33, y - 44, 28, 28, 6, 6);
             g2.setFont(new Font("Arial", Font.BOLD, 13));
             
             String blockStr = String.valueOf(block);
             FontMetrics fm = g2.getFontMetrics();
-            int textX = (x - 58) + (28 - fm.stringWidth(blockStr)) / 2;
+            int textX = (x - 33) + (28 - fm.stringWidth(blockStr)) / 2;
             int textY = (y - 44) + ((28 - fm.getHeight()) / 2) + fm.getAscent();
             g2.drawString(blockStr, textX, textY);
         }
     }
+
 
     private void drawHand(Graphics2D g2) {
         int w = getWidth();
@@ -245,20 +277,69 @@ public class CombatPanel extends JPanel {
     }
 
     private void drawCard(Graphics2D g2, Card card, int x, int y) {
-        g2.setColor(new Color(50, 50, 70));
-        g2.fillRoundRect(x, y, CARD_WIDTH, CARD_HEIGHT, 15, 15);
-        g2.setColor(Color.ORANGE);
-        g2.setStroke(new BasicStroke(2));
-        g2.drawRoundRect(x, y, CARD_WIDTH, CARD_HEIGHT, 15, 15);
-        
-        g2.setColor(Color.WHITE);
-        g2.setFont(new Font("Arial", Font.BOLD, 14));
-        g2.drawString(card.getName(), x + 10, y + 25);
-        
-        g2.setFont(new Font("Arial", Font.PLAIN, 12));
 
-        g2.drawString("Cost: " + card.getEnergyCost(), x + 10, y + 50);
+        g2.setColor(new Color(30, 30, 45));
+        g2.fillRoundRect(x, y, CARD_WIDTH, CARD_HEIGHT, 12, 12);
+        g2.setColor(new Color(255, 170, 0, 200));
+        g2.setStroke(new BasicStroke(1.5f));
+        g2.drawRoundRect(x, y, CARD_WIDTH, CARD_HEIGHT, 12, 12);
+        
+
+        g2.setColor(Color.WHITE);
+        g2.setFont(new Font("Arial", Font.BOLD, 12));
+        g2.drawString(card.getName(), x + 20, y + 25);
+        
+
+        g2.setColor(new Color(80, 80, 100));
+        g2.drawLine(x + 10, y + 35, x + CARD_WIDTH - 10, y + 35);
+
+
+        g2.setColor(card.getType() == Card.CardType.ATTACK ? new Color(180, 50, 50) : new Color(50, 120, 180));
+        g2.fillRoundRect(x + 15, y + 42, CARD_WIDTH - 30, 16, 4, 4);
+        g2.setColor(Color.WHITE);
+        g2.setFont(new Font("Arial", Font.BOLD, 9));
+        String typeText = card.getType().toString();
+        FontMetrics fmType = g2.getFontMetrics();
+        g2.drawString(typeText, x + (CARD_WIDTH - fmType.stringWidth(typeText)) / 2, y + 54);
+
+
+        g2.setColor(new Color(220, 220, 220));
+        g2.setFont(new Font("Arial", Font.PLAIN, 11));
+        String desc = card.getDescription();
+        if (desc != null && !desc.isEmpty()) {
+            String[] words = desc.split(" ");
+            StringBuilder currentLine = new StringBuilder();
+            int lineY = y + 80;
+            int maxTextWidth = CARD_WIDTH - 20;
+            
+            for (String word : words) {
+                String testLine = currentLine.length() == 0 ? word : currentLine + " " + word;
+                FontMetrics fm = g2.getFontMetrics();
+                if (fm.stringWidth(testLine) > maxTextWidth) {
+                    g2.drawString(currentLine.toString(), x + 10, lineY);
+                    lineY += 14;
+                    currentLine = new StringBuilder(word);
+                } else {
+                    currentLine = new StringBuilder(testLine);
+                }
+            }
+            if (currentLine.length() > 0) {
+                g2.drawString(currentLine.toString(), x + 10, lineY);
+            }
+        }
+
+
+        g2.setColor(new Color(230, 90, 40));
+        g2.fillOval(x - 8, y - 8, 22, 22);
+        g2.setColor(Color.WHITE);
+        g2.setStroke(new BasicStroke(1.5f));
+        g2.drawOval(x - 8, y - 8, 22, 22);
+        g2.setFont(new Font("Arial", Font.BOLD, 12));
+        String costStr = String.valueOf(card.getEnergyCost());
+        FontMetrics fmCost = g2.getFontMetrics();
+        g2.drawString(costStr, x - 8 + (22 - fmCost.stringWidth(costStr)) / 2, y - 8 + ((22 - fmCost.getHeight()) / 2) + fmCost.getAscent());
     }
+
 
     private void drawUIOverlay(Graphics2D g2) {
         int w = getWidth();
@@ -267,11 +348,31 @@ public class CombatPanel extends JPanel {
         int uiHeight = (int)(h * 0.3);
         
 
-        g2.setColor(Color.ORANGE);
-        g2.fillOval(50, uiStartY + (uiHeight - 100) / 2, 100, 100);
+
+        int orbX = 50;
+        int orbY = uiStartY + (uiHeight - 100) / 2;
+        if (energyOrbImage != null) {
+            g2.drawImage(energyOrbImage, orbX, orbY, 100, 100, null);
+        } else {
+            g2.setColor(Color.ORANGE);
+            g2.fillOval(orbX, orbY, 100, 100);
+        }
+
+
+        String energyText = player.getEnergy() + "/" + player.getMaxEnergy();
+        g2.setFont(new Font("Arial", Font.BOLD, 30));
+        FontMetrics fmEnergy = g2.getFontMetrics();
+        int textX = orbX + (100 - fmEnergy.stringWidth(energyText)) / 2;
+        int textY = orbY + ((100 - fmEnergy.getHeight()) / 2) + fmEnergy.getAscent();
+
+
         g2.setColor(Color.BLACK);
-        g2.setFont(new Font("Arial", Font.BOLD, 40));
-        g2.drawString(player.getEnergy() + "/" + player.getMaxEnergy(), 65, uiStartY + (uiHeight + 25) / 2);
+        g2.drawString(energyText, textX + 2, textY + 2);
+        
+
+        g2.setColor(Color.WHITE);
+        g2.drawString(energyText, textX, textY);
+
 
         g2.setColor(Color.WHITE);
         g2.setFont(new Font("Arial", Font.BOLD, 18));
