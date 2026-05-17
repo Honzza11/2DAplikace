@@ -15,8 +15,23 @@ public class CombatManager {
 
     public void startCombat() {
         System.out.println("\n=== COMBAT STARTED vs " + enemy.getName() + " ===");
+        player.setAttackedThisCombat(false);
         player.startTurn();
+        
+
+        for (Relic r : player.getRelics()) {
+            if (r.getName().equalsIgnoreCase("Anchor")) {
+                player.addBlock(10);
+            }
+            if (r.getName().equalsIgnoreCase("Lantern")) {
+                player.setEnergy(player.getEnergy() + 1);
+            }
+            if (r.getName().equalsIgnoreCase("Bag of Preparation")) {
+                player.drawCards(2);
+            }
+        }
     }
+
 
     public void endPlayerTurn() {
         System.out.println("\n--- Player ends turn ---");

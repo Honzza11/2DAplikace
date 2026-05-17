@@ -28,16 +28,25 @@ public class Card {
     }
 
     public void play(Entity user, Entity target) {
-        // Damage logic
+
         if (effects.containsKey("damage")) {
             int finalDamage = effects.get("damage");
             if (user instanceof AshWalker) {
                 finalDamage += ((AshWalker) user).getDamageBonus();
             }
+            if (user instanceof Player) {
+                Player p = (Player) user;
+                if (p.hasRelic("Akabeko") && !p.hasAttackedThisCombat()) {
+                    finalDamage += 8;
+                    p.setAttackedThisCombat(true);
+                    System.out.println("♪ Relic: Akabeko deals +8 additional damage!");
+                }
+            }
             if (target != null) {
                 target.takeDamage(finalDamage);
             }
         }
+
 
 
         if (effects.containsKey("block")) {

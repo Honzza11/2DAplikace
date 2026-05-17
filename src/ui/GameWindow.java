@@ -170,7 +170,7 @@ public class GameWindow extends JFrame {
     }
 
     private void generateAndShowMap() {
-        this.currentMap = new GameMap(7, 3);
+        this.currentMap = new GameMap(9, 3);
         MapPanel mapPanel = new MapPanel(this, currentMap);
         
         JScrollPane scrollPane = new JScrollPane(mapPanel);
@@ -267,4 +267,17 @@ public class GameWindow extends JFrame {
     public void showScreen(String screenName) {
         cardLayout.show(mainContainer, screenName);
     }
+
+    public void showCombatReward(boolean isElite) {
+        RewardPanel rewardPanel = new RewardPanel(this, currentPlayer, isElite, false);
+        mainContainer.add(rewardPanel, "REWARD");
+        showScreen("REWARD");
+    }
+
+    public void showTreasureReward() {
+        RewardPanel rewardPanel = new RewardPanel(this, currentPlayer, false, true);
+        mainContainer.add(rewardPanel, "REWARD");
+        showScreen("REWARD");
+    }
 }
+

@@ -1,0 +1,22 @@
+[
+  {
+    "name": "Strawberry",
+    "description": "Max HP increased by 10. Heal 10 HP."
+  },
+  {
+    "name": "Anchor",
+    "description": "Start each combat with 10 Block."
+  },
+  {
+    "name": "Lantern",
+    "description": "Start each combat with +1 Energy."
+  },
+  {
+    "name": "Bag of Preparation",
+    "description": "Draw 2 additional cards on your first turn."
+  },
+  {
+    "name": "Akabeko",
+    "description": "Your first attack in each combat deals 8 additional damage."
+  }
+]

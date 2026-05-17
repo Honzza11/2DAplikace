@@ -39,9 +39,10 @@ public class CombatPanel extends JPanel {
                 playerImage = new ImageIcon("Res/723-7239135_bard-png-transparent-png.png").getImage();
             }
             
-            if (enemy != null && enemy.getName().equalsIgnoreCase("Slime")) {
+            if (enemy != null && enemy.getName().toLowerCase().contains("slime")) {
                 enemyImage = new ImageIcon("Res/slime (1).png").getImage();
             }
+
 
             energyOrbImage = new ImageIcon("Res/pngtree-red-energy-orb-png-image_19759672 (1).png").getImage();
         } catch (Exception e) {
@@ -96,8 +97,10 @@ public class CombatPanel extends JPanel {
 
                     if (enemy.isDead()) {
                         System.out.println("Enemy defeated!");
-
+                        boolean isElite = enemy.getName().toLowerCase().contains("elite");
+                        gameWindow.showCombatReward(isElite);
                     }
+
                 }
                 break;
             }
@@ -378,5 +381,31 @@ public class CombatPanel extends JPanel {
         g2.setFont(new Font("Arial", Font.BOLD, 18));
         g2.drawString("Draw: " + player.getDeck().size(), 50, uiStartY + 30);
         g2.drawString("Discard: " + player.getDiscardPile().size(), 50, h - 30);
+
+
+        int rx = 20;
+        int ry = 20;
+        for (Relic relic : player.getRelics()) {
+
+            g2.setColor(new Color(0, 0, 0, 150));
+            g2.fillOval(rx + 2, ry + 2, 36, 36);
+
+
+            g2.setColor(new Color(60, 45, 20));
+            g2.fillOval(rx, ry, 36, 36);
+            g2.setColor(Color.ORANGE);
+            g2.setStroke(new BasicStroke(2));
+            g2.drawOval(rx, ry, 36, 36);
+            
+
+            g2.setColor(Color.WHITE);
+            g2.setFont(new Font("Arial", Font.BOLD, 18));
+            String initial = relic.getName().substring(0, 1).toUpperCase();
+            FontMetrics fm = g2.getFontMetrics();
+            g2.drawString(initial, rx + (36 - fm.stringWidth(initial)) / 2, ry + ((36 - fm.getHeight()) / 2) + fm.getAscent());
+            
+            rx += 46;
+        }
+
     }
 }

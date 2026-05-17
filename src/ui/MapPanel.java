@@ -136,9 +136,14 @@ public class MapPanel extends JPanel {
                         
 
                         if (node.getType() == NodeType.ENEMY || node.getType() == NodeType.ELITE) {
-                            Enemy enemy = new Enemy("Slime", 50);
+                            String enemyName = (node.getType() == NodeType.ELITE) ? "Elite Slime" : "Slime";
+                            int hp = (node.getType() == NodeType.ELITE) ? 80 : 50;
+                            Enemy enemy = new Enemy(enemyName, hp);
                             gameWindow.startCombat(enemy);
+                        } else if (node.getType() == NodeType.TREASURE) {
+                            gameWindow.showTreasureReward();
                         }
+
                     } else {
                         System.out.println("Node not reachable!");
                     }

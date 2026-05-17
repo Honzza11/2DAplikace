@@ -12,6 +12,9 @@ public class Player extends Entity {
     private List<Card> deck;
     private List<Card> hand;
     private List<Card> discardPile;
+    private List<Relic> relics;
+    private boolean attackedThisCombat;
+
 
     public Player(String name, int maxHp, int maxEnergy) {
         super(name, maxHp);
@@ -20,6 +23,8 @@ public class Player extends Entity {
         this.deck = new ArrayList<>();
         this.hand = new ArrayList<>();
         this.discardPile = new ArrayList<>();
+        this.relics = new ArrayList<>();
+        this.attackedThisCombat = false;
     }
 
     public void startTurn() {
@@ -96,4 +101,27 @@ public class Player extends Entity {
     public List<Card> getDeck() { return deck; }
     public List<Card> getHand() { return hand; }
     public List<Card> getDiscardPile() { return discardPile; }
+    
+    public List<Relic> getRelics() { return relics; }
+    
+    public void addRelic(Relic relic) {
+        relics.add(relic);
+        if (relic.getName().equalsIgnoreCase("Strawberry")) {
+            this.maxHp += 10;
+            this.hp = Math.min(this.maxHp, this.hp + 10);
+        }
+    }
+    
+    public boolean hasRelic(String relicName) {
+        for (Relic r : relics) {
+            if (r.getName().equalsIgnoreCase(relicName)) {
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    public boolean hasAttackedThisCombat() { return attackedThisCombat; }
+    public void setAttackedThisCombat(boolean attacked) { this.attackedThisCombat = attacked; }
 }
+
