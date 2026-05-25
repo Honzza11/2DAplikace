@@ -43,10 +43,17 @@ public class RewardPanel extends JPanel {
         if (!isTreasure) {
             List<Card> allCards = CardLoader.loadCards("Res/cards.json");
             if (allCards != null && !allCards.isEmpty()) {
-                Random rand = new Random();
-
-                for (int i = 0; i < 3; i++) {
-                    cardChoices.add(allCards.get(rand.nextInt(allCards.size())));
+                List<Card> validCards = new ArrayList<>();
+                String playerClass = player.getClass().getSimpleName();
+                for (Card c : allCards) {
+                    if (c.getHeroClass().equalsIgnoreCase("Neutral") || c.getHeroClass().equalsIgnoreCase(playerClass)) {
+                        validCards.add(c);
+                    }
+                }
+                
+                java.util.Collections.shuffle(validCards);
+                for (int i = 0; i < Math.min(3, validCards.size()); i++) {
+                    cardChoices.add(new Card(validCards.get(i)));
                 }
             }
         }

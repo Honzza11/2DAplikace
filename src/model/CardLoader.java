@@ -38,10 +38,11 @@ public class CardLoader {
         int cost = getIntField(data, "cost");
         String desc = getField(data, "description");
         String typeStr = getField(data, "type");
+        String heroClass = getField(data, "heroClass");
         
         if (name == null || typeStr == null) return;
 
-        Card card = new Card(name, cost, desc, Card.CardType.valueOf(typeStr.toUpperCase()));
+        Card card = new Card(name, cost, desc, Card.CardType.valueOf(typeStr.toUpperCase()), heroClass);
         
 
         addEffectIfPresent(data, "damage", card);

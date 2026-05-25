@@ -14,14 +14,26 @@ public class Card {
     protected String description;
     protected CardType type;
     protected Map<String, Integer> effects;
+    protected String heroClass;
 
-    public Card(String name, int cost, String description, CardType type) {
+    public Card(String name, int cost, String description, CardType type, String heroClass) {
         this.name = name;
         this.cost = cost;
         this.description = description;
         this.type = type;
         this.effects = new HashMap<>();
+        this.heroClass = heroClass != null ? heroClass : "Neutral";
     }
+
+    public Card(Card other) {
+        this.name = other.name;
+        this.cost = other.cost;
+        this.description = other.description;
+        this.type = other.type;
+        this.effects = new HashMap<>(other.effects);
+        this.heroClass = other.heroClass;
+    }
+
 
     public void addEffect(String key, int value) {
         effects.put(key, value);
@@ -64,6 +76,7 @@ public class Card {
     public int getEnergyCost() { return cost; }
     public String getDescription() { return description; }
     public CardType getType() { return type; }
+    public String getHeroClass() { return heroClass; }
 
     @Override
     public String toString() {

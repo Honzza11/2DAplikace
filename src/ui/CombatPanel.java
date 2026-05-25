@@ -22,6 +22,7 @@ public class CombatPanel extends JPanel {
     private static final int CARD_HEIGHT = 170;
     private JButton endTurnBtn;
     private JButton viewMapBtn;
+    private JButton viewDeckBtn;
 
     public CombatPanel(GameWindow gameWindow, Player player, Enemy enemy) {
         this.gameWindow = gameWindow;
@@ -36,7 +37,7 @@ public class CombatPanel extends JPanel {
             if (player instanceof AshWalker) {
                 playerImage = new ImageIcon("Res/assasin.png").getImage();
             } else if (player instanceof Bard) {
-                playerImage = new ImageIcon("Res/723-7239135_bard-png-transparent-png.png").getImage();
+                playerImage = new ImageIcon("Res/bard111.png").getImage();
             }
             
             if (enemy != null && enemy.getName().toLowerCase().contains("slime")) {
@@ -97,6 +98,12 @@ public class CombatPanel extends JPanel {
 
                     if (enemy.isDead()) {
                         System.out.println("Enemy defeated!");
+
+                        player.getDeck().addAll(player.getHand());
+                        player.getDeck().addAll(player.getDiscardPile());
+                        player.getHand().clear();
+                        player.getDiscardPile().clear();
+                        
                         boolean isElite = enemy.getName().toLowerCase().contains("elite");
                         gameWindow.showCombatReward(isElite);
                     }
@@ -112,6 +119,11 @@ public class CombatPanel extends JPanel {
         viewMapBtn.setFocusPainted(false);
         viewMapBtn.addActionListener(e -> gameWindow.showMapDialog());
         add(viewMapBtn);
+
+        viewDeckBtn = new JButton("VIEW DECK");
+        viewDeckBtn.setFocusPainted(false);
+        viewDeckBtn.addActionListener(e -> gameWindow.showDeckDialog());
+        add(viewDeckBtn);
 
         endTurnBtn = new JButton("END TURN");
         endTurnBtn.setFont(new Font("Arial", Font.BOLD, 20));
@@ -141,6 +153,7 @@ public class CombatPanel extends JPanel {
         int battleHeight = (int)(h * 0.7);
 
         viewMapBtn.setBounds(w - 180, 20, 150, 40);
+        viewDeckBtn.setBounds(w - 340, 20, 150, 40);
         endTurnBtn.setBounds(w - 200, h - 100, 150, 60);
         repaint();
     }
@@ -206,9 +219,9 @@ public class CombatPanel extends JPanel {
         g2.fillOval(x - 15, y + 285, 230, 25);
 
         if (playerImage != null && name.equals(player.getName())) {
-            g2.drawImage(playerImage, x, y, 200, 300, null);
+            drawImagePreservingAspectRatio(g2, playerImage, x, y, 200, 300);
         } else if (enemyImage != null && enemy != null && name.equals(enemy.getName())) {
-            g2.drawImage(enemyImage, x, y, 200, 300, null);
+            drawImagePreservingAspectRatio(g2, enemyImage, x, y, 200, 300);
         } else {
             g2.setColor(color);
             g2.fillOval(x, y, 200, 300);
@@ -407,5 +420,33 @@ public class CombatPanel extends JPanel {
             rx += 46;
         }
 
+    }
+
+    private void drawImagePreservingAspectRatio(Graphics2D g2, Image img, int boxX, int boxY, int boxW, int boxH) {
+        int imgW = img.getWidth(null);
+        int imgH = img.getHeight(null);
+        if (imgW <= 0 || imgH <= 0) {
+            g2.drawImage(img, boxX, boxY, boxW, boxH, null);
+            return;
+        }
+
+        double imgAspect = (double) imgW / imgH;
+        double boxAspect = (double) boxW / boxH;
+
+        int drawW = boxW;
+        int drawH = boxH;
+
+        if (imgAspect > boxAspect) {
+            drawW = boxW;
+            drawH = (int) (boxW / imgAspect);
+        } else {
+            drawH = boxH;
+            drawW = (int) (boxH * imgAspect);
+        }
+
+        int drawX = boxX + (boxW - drawW) / 2;
+        int drawY = boxY + (boxH - drawH);
+
+        g2.drawImage(img, drawX, drawY, drawW, drawH, null);
     }
 }

@@ -15,6 +15,7 @@ public class GameWindow extends JFrame {
     private JLabel combatLabel;
     
     private Player currentPlayer;
+    private JLabel mapHpLabel;
 
     public GameWindow() {
         setTitle("Kill the Pyre");
@@ -105,12 +106,32 @@ public class GameWindow extends JFrame {
         nameLabel.setBorder(BorderFactory.createEmptyBorder(10, 0, 5, 0));
         
 
-        String imagePath = type.equals("ASH_WALKER") ? "Res/assasin.png" : "Res/723-7239135_bard-png-transparent-png.png";
+        String imagePath = type.equals("ASH_WALKER") ? "Res/assasin.png" : "Res/bard111.png";
         ImageIcon heroIcon = null;
         try {
             ImageIcon origIcon = new ImageIcon(imagePath);
             Image img = origIcon.getImage();
-            Image scaledImg = img.getScaledInstance(120, 200, Image.SCALE_SMOOTH);
+            
+            int maxWidth = 120;
+            int maxHeight = 200;
+            int imgW = img.getWidth(null);
+            int imgH = img.getHeight(null);
+            int newWidth = maxWidth;
+            int newHeight = maxHeight;
+            
+            if (imgW > 0 && imgH > 0) {
+                double imgAspect = (double) imgW / imgH;
+                double boxAspect = (double) maxWidth / maxHeight;
+                if (imgAspect > boxAspect) {
+                    newWidth = maxWidth;
+                    newHeight = (int) (maxWidth / imgAspect);
+                } else {
+                    newHeight = maxHeight;
+                    newWidth = (int) (maxHeight * imgAspect);
+                }
+            }
+            
+            Image scaledImg = img.getScaledInstance(newWidth, newHeight, Image.SCALE_SMOOTH);
             heroIcon = new ImageIcon(scaledImg);
         } catch (Exception e) {
             System.err.println("Could not load hero preview image: " + e.getMessage());
@@ -178,12 +199,29 @@ public class GameWindow extends JFrame {
         scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         scrollPane.getVerticalScrollBar().setUnitIncrement(20);
 
-        JPanel mapControls = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        JPanel mapControls = new JPanel(new BorderLayout());
         mapControls.setBackground(new Color(240, 218, 181)); // Match parchment
+        mapControls.setBorder(BorderFactory.createEmptyBorder(5, 15, 5, 15));
+
+        mapHpLabel = new JLabel("HP: " + currentPlayer.getHealth() + " / " + currentPlayer.getMaxHealth());
+        mapHpLabel.setFont(new Font("Arial", Font.BOLD, 18));
+        mapHpLabel.setForeground(new Color(180, 40, 40));
+        mapControls.add(mapHpLabel, BorderLayout.WEST);
+
+        JPanel buttonsPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 0));
+        buttonsPanel.setOpaque(false);
+        
+        JButton deckBtn = new JButton("View Deck");
+        deckBtn.setFocusPainted(false);
+        deckBtn.addActionListener(e -> showDeckDialog());
+        buttonsPanel.add(deckBtn);
+
         JButton legendBtn = new JButton("Show Legend");
         legendBtn.setFocusPainted(false);
         legendBtn.addActionListener(e -> showLegendDialog());
-        mapControls.add(legendBtn);
+        buttonsPanel.add(legendBtn);
+
+        mapControls.add(buttonsPanel, BorderLayout.EAST);
 
         SwingUtilities.invokeLater(() -> {
             JScrollBar vertical = scrollPane.getVerticalScrollBar();
@@ -246,6 +284,26 @@ public class GameWindow extends JFrame {
         });
     }
 
+    public void showDeckDialog() {
+        if (currentPlayer == null) return;
+        
+        List<Card> fullDeck = new ArrayList<>();
+        fullDeck.addAll(currentPlayer.getDeck());
+        fullDeck.addAll(currentPlayer.getHand());
+        fullDeck.addAll(currentPlayer.getDiscardPile());
+        
+        JDialog dialog = new JDialog(this, "Current Deck (" + fullDeck.size() + " cards)", false);
+        DeckPanel deckPanel = new DeckPanel(fullDeck);
+        JScrollPane scrollPane = new JScrollPane(deckPanel);
+        scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+        scrollPane.getVerticalScrollBar().setUnitIncrement(20);
+        
+        dialog.add(scrollPane);
+        dialog.setSize(800, 600);
+        dialog.setLocationRelativeTo(this);
+        dialog.setVisible(true);
+    }
+
     private void showLegendDialog() {
         JDialog dialog = new JDialog(this, "Map Legend", false); // Non-modal
         dialog.add(new MapLegendPanel());
@@ -258,13 +316,16 @@ public class GameWindow extends JFrame {
     private void addCardsToDeck(List<Card> deck, List<Card> allCards, String name, int count) {
         for (Card c : allCards) {
             if (c.getName().equals(name)) {
-                for (int i = 0; i < count; i++) deck.add(c);
+                for (int i = 0; i < count; i++) deck.add(new Card(c));
                 return;
             }
         }
     }
 
     public void showScreen(String screenName) {
+        if (screenName.equals("MAP") && mapHpLabel != null && currentPlayer != null) {
+            mapHpLabel.setText("❤️ HP: " + currentPlayer.getHealth() + " / " + currentPlayer.getMaxHealth());
+        }
         cardLayout.show(mainContainer, screenName);
     }
 
