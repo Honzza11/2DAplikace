@@ -4,7 +4,7 @@ import javax.swing.*;
 import java.awt.*;
 
 public class OutlinedLabel extends JLabel {
-    private Color outlineColor = new Color(255, 140, 0); // Orange
+    private Color outlineColor = new Color(0, 0, 0); // Orange
     private int outlineWidth = 3;
 
     public OutlinedLabel(String text, int fontSize) {

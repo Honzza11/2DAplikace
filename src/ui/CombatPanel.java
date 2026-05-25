@@ -32,7 +32,7 @@ public class CombatPanel extends JPanel {
         
 
         try {
-            backgroundImage = new ImageIcon("c:\\Users\\jenik\\IdeaProjects\\2D Aplikace-Killthepyre\\Res\\dungeon (1).jpg").getImage();
+            backgroundImage = new ImageIcon("Res/pozadi dung.jpg").getImage();
             
             if (player instanceof AshWalker) {
                 playerImage = new ImageIcon("Res/assasin.png").getImage();
@@ -205,11 +205,11 @@ public class CombatPanel extends JPanel {
         int battleHeight = (int)(h * 0.7);
         
 
-        drawEntity(g2, player.getName(), (int)(w * 0.2) - 100, battleHeight - 370, player.getHealth(), player.getMaxHealth(), player.getBlock(), Color.CYAN);
+        drawEntity(g2, player.getName(), (int)(w * 0.3) - 100, battleHeight - 370, player.getHealth(), player.getMaxHealth(), player.getBlock(), Color.CYAN);
         
 
         if (enemy != null) {
-            drawEntity(g2, enemy.getName(), (int)(w * 0.8) - 100, battleHeight - 370, enemy.getHealth(), enemy.getMaxHealth(), enemy.getBlock(), Color.RED);
+            drawEntity(g2, enemy.getName(), (int)(w * 0.7) - 100, battleHeight - 370, enemy.getHealth(), enemy.getMaxHealth(), enemy.getBlock(), Color.RED);
         }
     }
 
@@ -226,12 +226,23 @@ public class CombatPanel extends JPanel {
             g2.setColor(color);
             g2.fillOval(x, y, 200, 300);
         }
-        
-        g2.setColor(Color.WHITE);
         g2.setFont(new Font("Arial", Font.BOLD, 24));
         FontMetrics fmEntity = g2.getFontMetrics();
         int nameX = x + (200 - fmEntity.stringWidth(name)) / 2;
-        g2.drawString(name, nameX, y - 60);
+        int nameY = y - 60;
+        
+        g2.setColor(Color.WHITE);
+        g2.drawString(name, nameX - 1, nameY - 1);
+        g2.drawString(name, nameX + 1, nameY - 1);
+        g2.drawString(name, nameX - 1, nameY + 1);
+        g2.drawString(name, nameX + 1, nameY + 1);
+        g2.drawString(name, nameX - 1, nameY);
+        g2.drawString(name, nameX + 1, nameY);
+        g2.drawString(name, nameX, nameY - 1);
+        g2.drawString(name, nameX, nameY + 1);
+        
+        g2.setColor(Color.BLACK);
+        g2.drawString(name, nameX, nameY);
 
 
         if (enemy != null && name.equals(enemy.getName())) {
@@ -251,9 +262,10 @@ public class CombatPanel extends JPanel {
         g2.fillRect(x, y - 40, barWidth, barHeight);
         g2.setColor(Color.GREEN);
         g2.fillRect(x, y - 40, healthWidth, barHeight);
-        g2.setColor(Color.WHITE);
+        g2.setColor(Color.BLACK);
         g2.drawRect(x, y - 40, barWidth, barHeight);
         
+        g2.setColor(Color.BLACK);
         g2.setFont(new Font("Arial", Font.BOLD, 14));
         String hpStr = hp + " / " + maxHp;
         FontMetrics fmHp = g2.getFontMetrics();

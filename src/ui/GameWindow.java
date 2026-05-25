@@ -27,7 +27,7 @@ public class GameWindow extends JFrame {
         cardLayout = new CardLayout();
         mainContainer = new JPanel(cardLayout);
 
-        BackgroundPanel menuPanel = new BackgroundPanel("Res/kill the pyre background menu.jpg");
+        BackgroundPanel menuPanel = new BackgroundPanel("Res/catle pozadi1.png");
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.gridx = 0;
         
@@ -69,7 +69,7 @@ public class GameWindow extends JFrame {
     }
 
     private JPanel createCharacterSelectPanel() {
-        BackgroundPanel panel = new BackgroundPanel("Res/kill the pyre background menu.jpg");
+        BackgroundPanel panel = new BackgroundPanel("Res/catle pozadi1.png");
         
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.gridx = 0;
