@@ -246,11 +246,29 @@ public class GameWindow extends JFrame {
 
     public void startCombat(Enemy enemy) {
 
+
+        currentPlayer.setAttackedThisCombat(false);
+        currentPlayer.resetBlock();
+
         currentPlayer.getHand().clear();
         currentPlayer.getDiscardPile().clear();
         currentPlayer.shuffleDeck();
-        currentPlayer.drawCards(5);
-        currentPlayer.setEnergy(currentPlayer.getMaxEnergy());
+        
+        int cardsToDraw = 5;
+        if (currentPlayer.hasRelic("Bag of Preparation")) {
+            cardsToDraw += 2;
+        }
+        currentPlayer.drawCards(cardsToDraw);
+
+        int startEnergy = currentPlayer.getMaxEnergy();
+        if (currentPlayer.hasRelic("Lantern")) {
+            startEnergy += 1;
+        }
+        currentPlayer.setEnergy(startEnergy);
+
+        if (currentPlayer.hasRelic("Anchor")) {
+            currentPlayer.addBlock(10);
+        }
 
         CombatPanel combatPanel = new CombatPanel(this, currentPlayer, enemy);
         mainContainer.add(combatPanel, "COMBAT");
@@ -280,7 +298,7 @@ public class GameWindow extends JFrame {
             JScrollBar horizontal = scrollPane.getHorizontalScrollBar();
             int max = horizontal.getMaximum();
             int extent = horizontal.getModel().getExtent();
-            horizontal.setValue((max - extent) / 2); // Center it
+            horizontal.setValue((max - extent) / 2);
         });
     }
 
@@ -347,7 +365,7 @@ public class GameWindow extends JFrame {
 
     public void showScreen(String screenName) {
         if (screenName.equals("MAP") && mapHpLabel != null && currentPlayer != null) {
-            mapHpLabel.setText("❤️ HP: " + currentPlayer.getHealth() + " / " + currentPlayer.getMaxHealth() + "   💰 " + currentPlayer.getGold());
+            mapHpLabel.setText("HP: " + currentPlayer.getHealth() + " / " + currentPlayer.getMaxHealth() + "    Gold: " + currentPlayer.getGold());
         }
         cardLayout.show(mainContainer, screenName);
     }
@@ -390,6 +408,12 @@ public class GameWindow extends JFrame {
         RewardPanel rewardPanel = new RewardPanel(this, currentPlayer, false, true);
         mainContainer.add(rewardPanel, "REWARD");
         showScreen("REWARD");
+    }
+
+    public void showRandomEvent() {
+        RandomEventPanel eventPanel = new RandomEventPanel(this, currentPlayer);
+        mainContainer.add(eventPanel, "EVENT");
+        showScreen("EVENT");
     }
 }
 

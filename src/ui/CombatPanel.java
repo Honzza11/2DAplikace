@@ -17,6 +17,9 @@ public class CombatPanel extends JPanel {
     private Image energyOrbImage;
     private GameWindow gameWindow;
     
+    private int mouseX = -1;
+    private int mouseY = -1;
+    
 
     private static final int CARD_WIDTH = 120;
     private static final int CARD_HEIGHT = 170;
@@ -60,6 +63,15 @@ public class CombatPanel extends JPanel {
             @Override
             public void mouseClicked(java.awt.event.MouseEvent e) {
                 handleCardClick(e.getX(), e.getY());
+            }
+        });
+
+        addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
+            @Override
+            public void mouseMoved(java.awt.event.MouseEvent e) {
+                mouseX = e.getX();
+                mouseY = e.getY();
+                repaint();
             }
         });
 
@@ -168,6 +180,7 @@ public class CombatPanel extends JPanel {
         drawEntities(g2);
         drawHand(g2);
         drawUIOverlay(g2);
+        drawTooltips(g2);
     }
 
     private void drawBackground(Graphics2D g2) {
@@ -432,6 +445,114 @@ public class CombatPanel extends JPanel {
             rx += 46;
         }
 
+    }
+
+    private void drawTooltips(Graphics2D g2) {
+        if (mouseX < 0 || mouseY < 0) return;
+
+        int panelW = getWidth();
+        int panelH = getHeight();
+
+        int rx = 20;
+        int ry = 20;
+
+        for (Relic relic : player.getRelics()) {
+            Rectangle iconBounds = new Rectangle(rx, ry, 36, 36);
+            if (iconBounds.contains(mouseX, mouseY)) {
+                renderRelicTooltip(g2, relic, mouseX, mouseY, panelW, panelH);
+                return;
+            }
+            rx += 46;
+        }
+    }
+
+    private void renderRelicTooltip(Graphics2D g2, Relic relic, int mouseX, int mouseY, int panelW, int panelH) {
+        final int padding = 8;
+        final int corner = 12;
+
+        Font titleFont = new Font("Arial", Font.BOLD, 16);
+        Font descFont = new Font("Arial", Font.PLAIN, 13);
+        g2.setFont(titleFont);
+        FontMetrics fmTitle = g2.getFontMetrics();
+
+        String title = relic.getName();
+        String desc = relic.getDescription() != null ? relic.getDescription() : "";
+
+        int maxWrapWidth = Math.max(120, Math.min(260, panelW - 40));
+        g2.setFont(descFont);
+        FontMetrics fmDesc = g2.getFontMetrics();
+
+        List<String> lines = wrapText(g2, desc, maxWrapWidth);
+
+        int titleWidth = fmTitle.stringWidth(title);
+        int maxLineWidth = titleWidth;
+        for (String line : lines) {
+            maxLineWidth = Math.max(maxLineWidth, fmDesc.stringWidth(line));
+        }
+
+        int tooltipW = maxLineWidth + padding * 2;
+        int lineHeight = fmDesc.getHeight();
+        int tooltipH = padding * 2 + fmTitle.getHeight() + 6 + lines.size() * lineHeight;
+
+        int tooltipX = mouseX + 15;
+        int tooltipY = mouseY + 15;
+
+        if (tooltipX + tooltipW > panelW - 5) tooltipX = mouseX - 15 - tooltipW;
+        if (tooltipX < 5) tooltipX = 5;
+        if (tooltipY + tooltipH > panelH - 5) tooltipY = mouseY - 15 - tooltipH;
+        if (tooltipY < 5) tooltipY = 5;
+
+        g2.setColor(new Color(0, 0, 0, 170));
+        g2.fillRoundRect(tooltipX, tooltipY, tooltipW, tooltipH, corner, corner);
+        g2.setColor(new Color(255, 180, 50, 160));
+        g2.drawRoundRect(tooltipX, tooltipY, tooltipW, tooltipH, corner, corner);
+
+
+        int textX = tooltipX + padding;
+        int y = tooltipY + padding + fmTitle.getAscent();
+        g2.setColor(Color.WHITE);
+        g2.setFont(titleFont);
+        g2.drawString(title, textX, y);
+
+
+        y += 6 + fmDesc.getAscent();
+        g2.setFont(descFont);
+        g2.setColor(new Color(230, 230, 230));
+        for (String line : lines) {
+            g2.drawString(line, textX, y);
+            y += lineHeight;
+        }
+    }
+
+    private List<String> wrapText(Graphics2D g2, String text, int maxWidth) {
+        List<String> lines = new ArrayList<>();
+        if (text == null || text.isEmpty()) {
+            lines.add("");
+            return lines;
+        }
+
+        FontMetrics fm = g2.getFontMetrics();
+        String[] words = text.split(" ");
+        StringBuilder current = new StringBuilder();
+
+        for (String word : words) {
+            if (word == null || word.isEmpty()) continue;
+
+            String test = current.length() == 0 ? word : current + " " + word;
+            if (fm.stringWidth(test) > maxWidth && current.length() > 0) {
+                lines.add(current.toString());
+                current = new StringBuilder(word);
+            } else {
+                if (current.length() == 0) current.append(word);
+                else current.append(" ").append(word);
+            }
+        }
+
+        if (current.length() > 0) {
+            lines.add(current.toString());
+        }
+
+        return lines;
     }
 
     private void drawImagePreservingAspectRatio(Graphics2D g2, Image img, int boxX, int boxY, int boxW, int boxH) {
