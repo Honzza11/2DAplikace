@@ -100,8 +100,9 @@ public class GameMap {
         if (tier == 4 || tier == 9) return NodeType.TREASURE;
 
         int rand = random.nextInt(100);
-        if (rand < 40) return NodeType.ENEMY;
-        if (rand < 70) return NodeType.EVENT;
+        if (rand < 30) return NodeType.ENEMY;
+        if (rand < 50) return NodeType.EVENT;
+        if (rand < 65) return NodeType.SHOP;
         if (rand < 85) return NodeType.REST;
         return NodeType.ELITE;
     }

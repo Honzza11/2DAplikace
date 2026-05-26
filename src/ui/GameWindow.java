@@ -191,7 +191,7 @@ public class GameWindow extends JFrame {
     }
 
     private void generateAndShowMap() {
-        this.currentMap = new GameMap(9, 3);
+        this.currentMap = new GameMap(15, 7);
         MapPanel mapPanel = new MapPanel(this, currentMap);
         
         JScrollPane scrollPane = new JScrollPane(mapPanel);
@@ -203,7 +203,7 @@ public class GameWindow extends JFrame {
         mapControls.setBackground(new Color(240, 218, 181)); // Match parchment
         mapControls.setBorder(BorderFactory.createEmptyBorder(5, 15, 5, 15));
 
-        mapHpLabel = new JLabel("HP: " + currentPlayer.getHealth() + " / " + currentPlayer.getMaxHealth());
+        mapHpLabel = new JLabel("❤️ HP: " + currentPlayer.getHealth() + " / " + currentPlayer.getMaxHealth() + "   💰 " + currentPlayer.getGold());
         mapHpLabel.setFont(new Font("Arial", Font.BOLD, 18));
         mapHpLabel.setForeground(new Color(180, 40, 40));
         mapControls.add(mapHpLabel, BorderLayout.WEST);
@@ -347,7 +347,7 @@ public class GameWindow extends JFrame {
 
     public void showScreen(String screenName) {
         if (screenName.equals("MAP") && mapHpLabel != null && currentPlayer != null) {
-            mapHpLabel.setText("❤️ HP: " + currentPlayer.getHealth() + " / " + currentPlayer.getMaxHealth());
+            mapHpLabel.setText("❤️ HP: " + currentPlayer.getHealth() + " / " + currentPlayer.getMaxHealth() + "   💰 " + currentPlayer.getGold());
         }
         cardLayout.show(mainContainer, screenName);
     }
@@ -356,6 +356,28 @@ public class GameWindow extends JFrame {
         RestPanel restPanel = new RestPanel(this, currentPlayer);
         mainContainer.add(restPanel, "REST");
         showScreen("REST");
+    }
+
+    public void showShop() {
+        ShopPanel shopPanel = new ShopPanel(this, currentPlayer);
+        mainContainer.add(shopPanel, "SHOP");
+        showScreen("SHOP");
+    }
+
+    public void showRemoveDialog(java.util.function.Consumer<Card> onRemove) {
+        JDialog dialog = new JDialog(this, "Select a card to Remove", true);
+        DeckPanel deckPanel = new DeckPanel(currentPlayer.getDeck(), card -> {
+            onRemove.accept(card);
+            dialog.dispose();
+        });
+        JScrollPane scrollPane = new JScrollPane(deckPanel);
+        scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+        scrollPane.getVerticalScrollBar().setUnitIncrement(20);
+        
+        dialog.add(scrollPane);
+        dialog.setSize(800, 600);
+        dialog.setLocationRelativeTo(this);
+        dialog.setVisible(true);
     }
 
     public void showCombatReward(boolean isElite) {

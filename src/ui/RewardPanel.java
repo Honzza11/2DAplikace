@@ -22,6 +22,7 @@ public class RewardPanel extends JPanel {
     private List<Card> cardChoices;
     private Card selectedCard;
     private Relic relicReward;
+    private int goldReward = 0;
 
     private JButton claimBtn;
     private JButton skipBtn;
@@ -41,6 +42,7 @@ public class RewardPanel extends JPanel {
 
 
         if (!isTreasure) {
+            goldReward = isElite ? 30 + new Random().nextInt(20) : 15 + new Random().nextInt(15);
             List<Card> allCards = CardLoader.loadCards("Res/cards.json");
             if (allCards != null && !allCards.isEmpty()) {
                 List<Card> validCards = new ArrayList<>();
@@ -140,9 +142,13 @@ public class RewardPanel extends JPanel {
     }
 
     private void claimRewards() {
-        if (!isTreasure && selectedCard != null) {
-            player.getDeck().add(selectedCard);
-            System.out.println("Added to deck: " + selectedCard.getName());
+        if (!isTreasure) {
+            player.addGold(goldReward);
+            System.out.println("Claimed " + goldReward + " gold.");
+            if (selectedCard != null) {
+                player.getDeck().add(selectedCard);
+                System.out.println("Added to deck: " + selectedCard.getName());
+            }
         }
         if (relicReward != null) {
             player.addRelic(relicReward);
@@ -152,6 +158,10 @@ public class RewardPanel extends JPanel {
     }
 
     private void skipRewards() {
+        if (!isTreasure) {
+            player.addGold(goldReward);
+            System.out.println("Claimed " + goldReward + " gold (skipped card).");
+        }
         if (relicReward != null) {
             player.addRelic(relicReward);
             System.out.println("Claimed Elite Relic: " + relicReward.getName() + " (skipped card)");
@@ -179,6 +189,14 @@ public class RewardPanel extends JPanel {
         String titleStr = isTreasure ? "TREASURE CHEST!" : "VICTORY!";
         FontMetrics fmTitle = g2.getFontMetrics();
         g2.drawString(titleStr, (w - fmTitle.stringWidth(titleStr)) / 2, 70);
+        
+        if (!isTreasure && goldReward > 0) {
+            g2.setColor(Color.YELLOW);
+            g2.setFont(new Font("Arial", Font.BOLD, 24));
+            String goldStr = "Reward: " + goldReward + " Gold 💰";
+            FontMetrics fmGold = g2.getFontMetrics();
+            g2.drawString(goldStr, (w - fmGold.stringWidth(goldStr)) / 2, 110);
+        }
 
 
         if (relicReward != null) {

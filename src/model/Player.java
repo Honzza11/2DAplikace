@@ -14,6 +14,7 @@ public class Player extends Entity {
     private List<Card> discardPile;
     private List<Relic> relics;
     private boolean attackedThisCombat;
+    private int gold;
 
 
     public Player(String name, int maxHp, int maxEnergy) {
@@ -25,6 +26,7 @@ public class Player extends Entity {
         this.discardPile = new ArrayList<>();
         this.relics = new ArrayList<>();
         this.attackedThisCombat = false;
+        this.gold = 99;
     }
 
     public void startTurn() {
@@ -123,5 +125,9 @@ public class Player extends Entity {
     
     public boolean hasAttackedThisCombat() { return attackedThisCombat; }
     public void setAttackedThisCombat(boolean attacked) { this.attackedThisCombat = attacked; }
+    
+    public int getGold() { return gold; }
+    public void addGold(int amount) { this.gold += amount; }
+    public void removeGold(int amount) { this.gold = Math.max(0, this.gold - amount); }
 }
 
