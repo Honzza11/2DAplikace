@@ -15,6 +15,11 @@ public class Card {
     protected CardType type;
     protected Map<String, Integer> effects;
     protected String heroClass;
+    
+    protected boolean isUpgraded = false;
+    protected Map<String, Integer> upgradeEffects;
+    protected String upgradeDescription;
+    protected Integer upgradeCostOverride;
 
     public Card(String name, int cost, String description, CardType type, String heroClass) {
         this.name = name;
@@ -22,6 +27,7 @@ public class Card {
         this.description = description;
         this.type = type;
         this.effects = new HashMap<>();
+        this.upgradeEffects = new HashMap<>();
         this.heroClass = heroClass != null ? heroClass : "Neutral";
     }
 
@@ -32,11 +38,27 @@ public class Card {
         this.type = other.type;
         this.effects = new HashMap<>(other.effects);
         this.heroClass = other.heroClass;
+        this.isUpgraded = other.isUpgraded;
+        this.upgradeEffects = new HashMap<>(other.upgradeEffects);
+        this.upgradeDescription = other.upgradeDescription;
+        this.upgradeCostOverride = other.upgradeCostOverride;
     }
 
 
     public void addEffect(String key, int value) {
         effects.put(key, value);
+    }
+    
+    public void addUpgradeEffect(String key, int value) {
+        upgradeEffects.put(key, value);
+    }
+
+    public void setUpgradeDescription(String desc) {
+        this.upgradeDescription = desc;
+    }
+
+    public void setUpgradeCostOverride(int cost) {
+        this.upgradeCostOverride = cost;
     }
 
     public void play(Entity user, Entity target) {
@@ -77,6 +99,31 @@ public class Card {
     public String getDescription() { return description; }
     public CardType getType() { return type; }
     public String getHeroClass() { return heroClass; }
+    public boolean isUpgraded() { return isUpgraded; }
+    
+    public void upgrade() {
+        if (!isUpgraded) {
+            isUpgraded = true;
+            name += "+";
+            
+            if (upgradeDescription != null) {
+                description = upgradeDescription;
+            }
+            if (upgradeCostOverride != null) {
+                cost = upgradeCostOverride;
+            }
+            
+            for (Map.Entry<String, Integer> entry : upgradeEffects.entrySet()) {
+                String key = entry.getKey();
+                int upgradeAmount = entry.getValue();
+                if (effects.containsKey(key)) {
+                    effects.put(key, effects.get(key) + upgradeAmount);
+                } else {
+                    effects.put(key, upgradeAmount);
+                }
+            }
+        }
+    }
 
     @Override
     public String toString() {

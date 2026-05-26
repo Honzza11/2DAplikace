@@ -49,6 +49,20 @@ public class CardLoader {
         addEffectIfPresent(data, "block", card);
         addEffectIfPresent(data, "heat_gain", card);
 
+        addUpgradeEffectIfPresent(data, "damage", card);
+        addUpgradeEffectIfPresent(data, "block", card);
+        addUpgradeEffectIfPresent(data, "heat_gain", card);
+        
+        String upDesc = getField(data, "upgrade_description");
+        if (upDesc != null) card.setUpgradeDescription(upDesc);
+        
+        String upCost = getField(data, "upgrade_cost");
+        if (upCost != null) {
+            try {
+                card.setUpgradeCostOverride(Integer.parseInt(upCost));
+            } catch (NumberFormatException ignored) {}
+        }
+
         cards.add(card);
     }
 
@@ -57,6 +71,15 @@ public class CardLoader {
         if (val != null) {
             try {
                 card.addEffect(field, Integer.parseInt(val));
+            } catch (NumberFormatException ignored) {}
+        }
+    }
+
+    private static void addUpgradeEffectIfPresent(String data, String field, Card card) {
+        String val = getField(data, "upgrade_" + field);
+        if (val != null) {
+            try {
+                card.addUpgradeEffect(field, Integer.parseInt(val));
             } catch (NumberFormatException ignored) {}
         }
     }

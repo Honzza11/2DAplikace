@@ -41,4 +41,9 @@ public abstract class Entity {
     public int getMaxHealth() { return maxHp; }
     public int getBlock() { return block; }
     public boolean isDead() { return hp <= 0; }
+    
+    public void heal(int amount) {
+        hp = Math.min(maxHp, hp + amount);
+        System.out.println(name + " heals for " + amount + " HP. Current HP: " + hp);
+    }
 }

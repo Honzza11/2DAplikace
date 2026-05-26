@@ -142,6 +142,8 @@ public class MapPanel extends JPanel {
                             gameWindow.startCombat(enemy);
                         } else if (node.getType() == NodeType.TREASURE) {
                             gameWindow.showTreasureReward();
+                        } else if (node.getType() == NodeType.REST) {
+                            gameWindow.showRestSite();
                         }
 
                     } else {

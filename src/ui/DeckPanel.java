@@ -4,15 +4,24 @@ import model.Card;
 import javax.swing.*;
 import java.awt.*;
 import java.util.List;
+import java.util.function.Consumer;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 public class DeckPanel extends JPanel {
     private List<Card> cards;
+    private Consumer<Card> onCardSelected;
     private static final int CARD_WIDTH = 130;
     private static final int CARD_HEIGHT = 185;
     private static final int SPACING = 20;
 
     public DeckPanel(List<Card> cards) {
+        this(cards, null);
+    }
+
+    public DeckPanel(List<Card> cards, Consumer<Card> onCardSelected) {
         this.cards = cards;
+        this.onCardSelected = onCardSelected;
         setBackground(new Color(20, 20, 30));
         setLayout(null);
         updatePreferredSize(800);
@@ -23,6 +32,32 @@ public class DeckPanel extends JPanel {
                 updatePreferredSize(getWidth());
             }
         });
+
+        if (onCardSelected != null) {
+            setCursor(new Cursor(Cursor.HAND_CURSOR));
+            addMouseListener(new MouseAdapter() {
+                @Override
+                public void mouseClicked(MouseEvent e) {
+                    int w = getWidth();
+                    int cols = Math.max(1, (w - SPACING) / (CARD_WIDTH + SPACING));
+                    int gridWidth = cols * (CARD_WIDTH + SPACING) - SPACING;
+                    int startX = (w - gridWidth) / 2;
+                    int startY = SPACING + 10;
+                    
+                    for (int i = 0; i < cards.size(); i++) {
+                        int row = i / cols;
+                        int col = i % cols;
+                        int x = startX + col * (CARD_WIDTH + SPACING);
+                        int y = startY + row * (CARD_HEIGHT + SPACING);
+                        if (e.getX() >= x && e.getX() <= x + CARD_WIDTH &&
+                            e.getY() >= y && e.getY() <= y + CARD_HEIGHT) {
+                            onCardSelected.accept(cards.get(i));
+                            break;
+                        }
+                    }
+                }
+            });
+        }
     }
 
     private void updatePreferredSize(int panelWidth) {

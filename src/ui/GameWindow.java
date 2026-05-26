@@ -304,6 +304,29 @@ public class GameWindow extends JFrame {
         dialog.setVisible(true);
     }
 
+    public void showSmithDialog(java.util.function.Consumer<Card> onUpgrade) {
+        List<Card> upgradable = new ArrayList<>();
+        for (Card c : currentPlayer.getDeck()) {
+            if (!c.isUpgraded()) {
+                upgradable.add(c);
+            }
+        }
+        
+        JDialog dialog = new JDialog(this, "Select a card to Upgrade", true);
+        DeckPanel deckPanel = new DeckPanel(upgradable, card -> {
+            onUpgrade.accept(card);
+            dialog.dispose();
+        });
+        JScrollPane scrollPane = new JScrollPane(deckPanel);
+        scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+        scrollPane.getVerticalScrollBar().setUnitIncrement(20);
+        
+        dialog.add(scrollPane);
+        dialog.setSize(800, 600);
+        dialog.setLocationRelativeTo(this);
+        dialog.setVisible(true);
+    }
+
     private void showLegendDialog() {
         JDialog dialog = new JDialog(this, "Map Legend", false); // Non-modal
         dialog.add(new MapLegendPanel());
@@ -327,6 +350,12 @@ public class GameWindow extends JFrame {
             mapHpLabel.setText("❤️ HP: " + currentPlayer.getHealth() + " / " + currentPlayer.getMaxHealth());
         }
         cardLayout.show(mainContainer, screenName);
+    }
+
+    public void showRestSite() {
+        RestPanel restPanel = new RestPanel(this, currentPlayer);
+        mainContainer.add(restPanel, "REST");
+        showScreen("REST");
     }
 
     public void showCombatReward(boolean isElite) {

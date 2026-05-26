@@ -6,7 +6,9 @@
     "type": "ATTACK",
     "description": "Deal 6 damage.",
     "damage": 6,
-    "heroClass": "Neutral"
+    "heroClass": "Neutral",
+    "upgrade_damage": 3,
+    "upgrade_description": "Deal 9 damage."
   },
   {
     "id": "defend",
@@ -15,7 +17,9 @@
     "type": "SKILL",
     "description": "Gain 5 Block.",
     "block": 5,
-    "heroClass": "Neutral"
+    "heroClass": "Neutral",
+    "upgrade_block": 3,
+    "upgrade_description": "Gain 8 Block."
   },
   {
     "id": "cinder_strike",
@@ -25,7 +29,10 @@
     "description": "Deal 8 damage. Gain 2 Heat.",
     "damage": 8,
     "heat_gain": 2,
-    "heroClass": "AshWalker"
+    "heroClass": "AshWalker",
+    "upgrade_damage": 2,
+    "upgrade_heat_gain": 1,
+    "upgrade_description": "Deal 10 damage. Gain 3 Heat."
   },
   {
     "id": "soul_melody",
@@ -34,15 +41,19 @@
     "type": "SKILL",
     "description": "Gain 7 Block. Adds a Skill note.",
     "block": 7,
-    "heroClass": "Bard"
+    "heroClass": "Bard",
+    "upgrade_block": 3,
+    "upgrade_description": "Gain 10 Block. Adds a Skill note."
   },
   {
     "id": "dangerous_note",
     "name": "Dangerous Note",
     "cost": 2,
     "type": "ATTACK",
-    "description": "Deal 6 damage. Adds 2 Attack notes.",
-    "damage": 6,
-    "heroClass": "Bard"
+    "description": "Deal 12 damage. Adds an Attack note.",
+    "damage": 12,
+    "heroClass": "Bard",
+    "upgrade_cost": 1,
+    "upgrade_description": "Deal 12 damage. Adds an Attack note."
   }
 ]
