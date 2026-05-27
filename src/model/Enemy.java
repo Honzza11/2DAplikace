@@ -4,6 +4,7 @@ package model;
 public class Enemy extends Entity {
     private String intentDescription;
     private int nextDamage;
+    private int weaknessTurns = 0;
 
     public Enemy(String name, int maxHp) {
         super(name, maxHp);
@@ -19,7 +20,11 @@ public class Enemy extends Entity {
     public void takeTurn(Player player) {
         System.out.println(name + " performs: " + intentDescription);
         player.takeDamage(nextDamage);
-        decideIntent(); // Decide intent for next turn
+        decideIntent();
+
+        if (weaknessTurns > 0) {
+            weaknessTurns--;
+        }
     }
 
     public String getIntentDescription() {
@@ -28,5 +33,14 @@ public class Enemy extends Entity {
 
     public int getNextDamage() {
         return nextDamage;
+    }
+
+    public void applyWeakness(int turns) {
+        weaknessTurns = Math.max(weaknessTurns, turns);
+        System.out.println(name + " gains Weakness (" + weaknessTurns + " turns)");
+    }
+
+    public boolean isWeakened() {
+        return weaknessTurns > 0;
     }
 }

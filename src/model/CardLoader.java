@@ -48,10 +48,22 @@ public class CardLoader {
         addEffectIfPresent(data, "damage", card);
         addEffectIfPresent(data, "block", card);
         addEffectIfPresent(data, "heat_gain", card);
+        addEffectIfPresent(data, "heat_loss", card);
+        addEffectIfPresent(data, "rhythm_bonus_damage", card);
+        addEffectIfPresent(data, "rhythm_bonus_block", card);
+        addEffectIfPresent(data, "echo", card);
+        addEffectIfPresent(data, "energy_gain", card);
+        addEffectIfPresent(data, "draw", card);
 
         addUpgradeEffectIfPresent(data, "damage", card);
         addUpgradeEffectIfPresent(data, "block", card);
         addUpgradeEffectIfPresent(data, "heat_gain", card);
+        addUpgradeEffectIfPresent(data, "heat_loss", card);
+        addUpgradeEffectIfPresent(data, "rhythm_bonus_damage", card);
+        addUpgradeEffectIfPresent(data, "rhythm_bonus_block", card);
+        addUpgradeEffectIfPresent(data, "echo", card);
+        addUpgradeEffectIfPresent(data, "energy_gain", card);
+        addUpgradeEffectIfPresent(data, "draw", card);
         
         String upDesc = getField(data, "upgrade_description");
         if (upDesc != null) card.setUpgradeDescription(upDesc);

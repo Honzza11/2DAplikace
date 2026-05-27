@@ -145,13 +145,22 @@ public class CombatPanel extends JPanel {
         endTurnBtn.addActionListener(e -> {
 
             player.discardHand();
-            
 
+
+            if (player instanceof AshWalker) {
+                ((AshWalker) player).endTurn();
+            }
+            
             if (enemy != null && !enemy.isDead()) {
                 enemy.takeTurn(player);
             }
 
             player.startTurn();
+
+
+            if (player instanceof Bard && enemy != null) {
+                ((Bard) player).playEchoCards(enemy);
+            }
             
             repaint();
         });
@@ -443,6 +452,45 @@ public class CombatPanel extends JPanel {
             g2.drawString(initial, rx + (36 - fm.stringWidth(initial)) / 2, ry + ((36 - fm.getHeight()) / 2) + fm.getAscent());
             
             rx += 46;
+        }
+
+
+        if (player instanceof AshWalker) {
+            AshWalker ash = (AshWalker) player;
+            g2.setColor(Color.WHITE);
+            g2.setFont(new Font("Arial", Font.BOLD, 16));
+            g2.drawString("Heat: " + ash.getHeat(), 50, uiStartY + 60);
+        }
+
+        if (player instanceof Bard) {
+            Bard bard = (Bard) player;
+            List<Bard.Tone> tones = bard.getCurrentTones();
+
+            g2.setColor(Color.WHITE);
+            g2.setFont(new Font("Arial", Font.BOLD, 16));
+            g2.drawString("Chord:", 20, 90);
+
+            int startX = 20;
+            int y = 100;
+            int circle = 14;
+            int chordSize = 3;
+            for (int i = 0; i < chordSize; i++) {
+                int cx = startX + i * 26;
+                boolean filled = i < tones.size();
+                Color fill = Color.GRAY;
+                if (filled) {
+                    Bard.Tone t = tones.get(i);
+                    if (t == Bard.Tone.RED) fill = Color.RED;
+                    if (t == Bard.Tone.BLUE) fill = new Color(80, 160, 255);
+                    if (t == Bard.Tone.GREEN) fill = new Color(70, 200, 120);
+                }
+                g2.setColor(new Color(0, 0, 0, 120));
+                g2.fillOval(cx + 2, y + 2, circle, circle);
+                g2.setColor(fill);
+                g2.fillOval(cx, y, circle, circle);
+                g2.setColor(Color.WHITE);
+                g2.drawOval(cx, y, circle, circle);
+            }
         }
 
     }

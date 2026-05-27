@@ -61,12 +61,27 @@ public class Card {
         this.upgradeCostOverride = cost;
     }
 
+    public boolean hasEffect(String key) {
+        return effects.containsKey(key);
+    }
+
+    public int getEffectValue(String key) {
+        if (!effects.containsKey(key)) return 0;
+        return effects.get(key);
+    }
+
     public void play(Entity user, Entity target) {
 
         if (effects.containsKey("damage")) {
             int finalDamage = effects.get("damage");
             if (user instanceof AshWalker) {
                 finalDamage += ((AshWalker) user).getDamageBonus();
+            }
+            if (user instanceof Bard) {
+                Bard bard = (Bard) user;
+                if (bard.isRhythmTriggered(this.type) && effects.containsKey("rhythm_bonus_damage")) {
+                    finalDamage += effects.get("rhythm_bonus_damage");
+                }
             }
             if (user instanceof Player) {
                 Player p = (Player) user;
@@ -76,6 +91,10 @@ public class Card {
                     System.out.println("♪ Relic: Akabeko deals +8 additional damage!");
                 }
             }
+            if (target instanceof Enemy && ((Enemy) target).isWeakened()) {
+
+                finalDamage = (int) Math.round(finalDamage * 1.5);
+            }
             if (target != null) {
                 target.takeDamage(finalDamage);
             }
@@ -84,12 +103,33 @@ public class Card {
 
 
         if (effects.containsKey("block")) {
-            user.addBlock(effects.get("block"));
+            int blockAmount = effects.get("block");
+            if (user instanceof Bard) {
+                Bard bard = (Bard) user;
+                if (bard.isRhythmTriggered(this.type) && effects.containsKey("rhythm_bonus_block")) {
+                    blockAmount += effects.get("rhythm_bonus_block");
+                }
+            }
+            user.addBlock(blockAmount);
         }
 
 
         if (effects.containsKey("heat_gain") && user instanceof AshWalker) {
             ((AshWalker) user).addHeat(effects.get("heat_gain"));
+        }
+
+        if (effects.containsKey("heat_loss") && user instanceof AshWalker) {
+            ((AshWalker) user).reduceHeat(effects.get("heat_loss"));
+        }
+
+        if (effects.containsKey("energy_gain") && user instanceof Player) {
+            Player p = (Player) user;
+            p.setEnergy(p.getEnergy() + effects.get("energy_gain"));
+        }
+
+        if (effects.containsKey("draw") && user instanceof Player) {
+            Player p = (Player) user;
+            p.drawCards(effects.get("draw"));
         }
     }
 

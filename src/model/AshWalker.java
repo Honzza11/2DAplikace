@@ -23,7 +23,7 @@ public class AshWalker extends Player {
     }
 
     @Override
-    public void onCardPlayed(Card card) {
+    public void onCardPlayed(Card card, Entity target) {
 
     }
 
@@ -43,5 +43,9 @@ public class AshWalker extends Player {
 
     public int getDamageBonus() {
         return heat / 2;
+    }
+
+    public void resetHeat() {
+        heat = 0;
     }
 }

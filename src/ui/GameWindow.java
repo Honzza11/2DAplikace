@@ -81,9 +81,24 @@ public class GameWindow extends JFrame {
 
         JPanel heroesBox = new JPanel(new GridLayout(1, 2, 40, 0));
         heroesBox.setOpaque(false);
-        
-        heroesBox.add(createHeroOption("Ash Walker", "Aggressive & Risky. Uses Heat to deal massive damage.", "ASH_WALKER"));
-        heroesBox.add(createHeroOption("Bard", "Tactical & Defensive. Uses Chords to trigger powerful songs.", "BARD"));
+
+
+        // 🌟 ENGLISH TEXT FOR ASH WALKER
+        String ashWalkerDesc = "Aggressive & Risky.\n\n"
+                + "HEAT MECHANIC:\n"
+                + "Attack cards generate Heat points, which drastically increase the damage of your subsequent attacks.\n\n"
+                + "WARNING: If your Heat exceeds the limit at the end of your turn, you will take overheat damage! "
+                + "You must strategically alternate attacks with cooling skills (like Quench & Coils) that safely reduce Heat and generate Block.";
+
+        // 🌟 ENGLISH TEXT FOR BARD
+        String bardDesc = "Tactical & Defensive.\n\n"
+                + "RHYTHM & NOTES MECHANIC:\n"
+                + "Playing cards composes songs. Each card adds an Attack or Skill note to your active bar.\n\n"
+                + "RHYTHM EFFECT:\n"
+                + "Many of your cards gain massive bonuses to damage or Block if played in rhythm – meaning if the currently played card is a different type (Attack/Skill) than the previous one. Compose your tones wisely!";
+
+        heroesBox.add(createHeroOption("Ash Walker", ashWalkerDesc, "ASH_WALKER"));
+        heroesBox.add(createHeroOption("Bard", bardDesc, "BARD"));
         
         gbc.gridy = 1;
         gbc.weighty = 1.0;
@@ -96,7 +111,7 @@ public class GameWindow extends JFrame {
 
     private JPanel createHeroOption(String name, String desc, String type) {
         JPanel panel = new JPanel(new BorderLayout(10, 10));
-        panel.setPreferredSize(new Dimension(320, 480));
+        panel.setPreferredSize(new Dimension(480, 640));
         panel.setBackground(new Color(20, 20, 20, 220));
         panel.setBorder(BorderFactory.createLineBorder(Color.ORANGE, 2));
 
@@ -104,21 +119,21 @@ public class GameWindow extends JFrame {
         nameLabel.setFont(new Font("Arial", Font.BOLD, 28));
         nameLabel.setForeground(Color.WHITE);
         nameLabel.setBorder(BorderFactory.createEmptyBorder(10, 0, 5, 0));
-        
+
 
         String imagePath = type.equals("ASH_WALKER") ? "Res/assasin.png" : "Res/bard111.png";
         ImageIcon heroIcon = null;
         try {
             ImageIcon origIcon = new ImageIcon(imagePath);
             Image img = origIcon.getImage();
-            
+
             int maxWidth = 120;
             int maxHeight = 200;
             int imgW = img.getWidth(null);
             int imgH = img.getHeight(null);
             int newWidth = maxWidth;
             int newHeight = maxHeight;
-            
+
             if (imgW > 0 && imgH > 0) {
                 double imgAspect = (double) imgW / imgH;
                 double boxAspect = (double) maxWidth / maxHeight;
@@ -130,7 +145,7 @@ public class GameWindow extends JFrame {
                     newWidth = (int) (maxHeight * imgAspect);
                 }
             }
-            
+
             Image scaledImg = img.getScaledInstance(newWidth, newHeight, Image.SCALE_SMOOTH);
             heroIcon = new ImageIcon(scaledImg);
         } catch (Exception e) {
@@ -154,17 +169,17 @@ public class GameWindow extends JFrame {
         descArea.setWrapStyleWord(true);
         descArea.setEditable(false);
         descArea.setMargin(new Insets(10, 20, 10, 20));
-        
+
         centerPanel.add(descArea, BorderLayout.CENTER);
 
         JButton selectBtn = new JButton("Select");
         selectBtn.setFont(new Font("Arial", Font.BOLD, 20));
         selectBtn.addActionListener(e -> selectCharacter(type));
-        
+
         panel.add(nameLabel, BorderLayout.NORTH);
         panel.add(centerPanel, BorderLayout.CENTER);
         panel.add(selectBtn, BorderLayout.SOUTH);
-        
+
         return panel;
     }
 
@@ -174,14 +189,17 @@ public class GameWindow extends JFrame {
         
         if (type.equals("ASH_WALKER")) {
             currentPlayer = new AshWalker("Ash Walker", 80, 3);
-            addCardsToDeck(deck, allCards, "Strike", 5);
-            addCardsToDeck(deck, allCards, "Defend", 4);
+            addCardsToDeck(deck, allCards, "Strike", 4);
+            addCardsToDeck(deck, allCards, "Defend", 3);
             addCardsToDeck(deck, allCards, "Cinder Strike", 1);
+            addCardsToDeck(deck, allCards, "Obsidian Dagger", 2);
+
         } else {
             currentPlayer = new Bard("Bard", 70, 3);
-            addCardsToDeck(deck, allCards, "Strike", 5);
+            addCardsToDeck(deck, allCards, "Strike", 3);
             addCardsToDeck(deck, allCards, "Defend", 4);
             addCardsToDeck(deck, allCards, "Soul Melody", 1);
+            addCardsToDeck(deck, allCards, "Dangerous Note", 1);
         }
         
         currentPlayer.setDeck(deck);
@@ -249,6 +267,12 @@ public class GameWindow extends JFrame {
 
         currentPlayer.setAttackedThisCombat(false);
         currentPlayer.resetBlock();
+        if (currentPlayer instanceof AshWalker) {
+            ((AshWalker) currentPlayer).resetHeat();
+        }
+        if (currentPlayer instanceof Bard) {
+            ((Bard) currentPlayer).resetForCombat();
+        }
 
         currentPlayer.getHand().clear();
         currentPlayer.getDiscardPile().clear();

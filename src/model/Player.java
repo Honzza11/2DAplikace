@@ -64,7 +64,7 @@ public class Player extends Entity {
             
             System.out.println(name + " plays " + card.getName());
             card.play(this, target);
-            onCardPlayed(card);
+            onCardPlayed(card, target);
             
             discardPile.add(card);
             return true;
@@ -73,7 +73,7 @@ public class Player extends Entity {
         return false;
     }
 
-    public void onCardPlayed(Card card) {
+    public void onCardPlayed(Card card, Entity target) {
 
     }
 
