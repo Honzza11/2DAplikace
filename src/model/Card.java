@@ -71,11 +71,56 @@ public class Card {
     }
 
     public void play(Entity user, Entity target) {
+        int plays = effects.getOrDefault("multi_attack", 1);
+        for (int i = 0; i < plays; i++) {
+            resolveSinglePlay(user, target);
+        }
+    }
+
+    private void resolveSinglePlay(Entity user, Entity target) {
+        boolean conditionMet = true;
+        if (effects.containsKey("condition_heat_max") && user instanceof AshWalker) {
+            if (((AshWalker) user).getHeat() >= effects.get("condition_heat_max")) conditionMet = false;
+        }
+        if (effects.containsKey("condition_heat_min") && user instanceof AshWalker) {
+            if (((AshWalker) user).getHeat() < effects.get("condition_heat_min")) conditionMet = false;
+        }
+        if (effects.containsKey("condition_heat") && user instanceof AshWalker) {
+            if (((AshWalker) user).getHeat() != effects.get("condition_heat")) conditionMet = false;
+        }
+
+        if (effects.containsKey("heal") && conditionMet) {
+            user.heal(effects.get("heal"));
+        }
+
+        if (effects.containsKey("consume_heat_for_block") && user instanceof AshWalker) {
+            AshWalker ash = (AshWalker) user;
+            int heat = ash.getHeat();
+            if (heat > 0) {
+                user.addBlock(heat);
+                ash.resetHeat();
+            }
+        }
 
         if (effects.containsKey("damage")) {
             int finalDamage = effects.get("damage");
+            if (!conditionMet && effects.containsKey("condition_heat")) {
+                // If condition failed, absolute zero falls back to 6. Let's do a hardcode fallback or assume it just doesn't get bonus.
+                // Wait, "V opačném případě způsobí jen 6 DMG." 
+                // Let's just handle it via conditionMet. If condition failed and we have base damage, we can deal a smaller damage?
+                // For simplicity, if condition_heat fails, we'll just deal the base damage. If it succeeds, we deal base + something?
+                // Actually, let's just make Absolute Zero have base damage 6, and if condition meets, it adds 12 damage. We need "conditional_bonus_damage".
+                // I will add "condition_bonus_damage".
+            }
+            if (conditionMet && effects.containsKey("condition_bonus_damage")) {
+                finalDamage += effects.get("condition_bonus_damage");
+            }
+
             if (user instanceof AshWalker) {
                 finalDamage += ((AshWalker) user).getDamageBonus();
+                if (effects.containsKey("heat_bonus_damage")) {
+                    finalDamage += ((AshWalker) user).getHeat();
+                }
             }
             if (user instanceof Bard) {
                 Bard bard = (Bard) user;
@@ -91,18 +136,29 @@ public class Card {
                     System.out.println("♪ Relic: Akabeko deals +8 additional damage!");
                 }
             }
-            if (target instanceof Enemy && ((Enemy) target).isWeakened()) {
-
-                finalDamage = (int) Math.round(finalDamage * 1.5);
+            if (target instanceof Enemy && target.getVulnerableTurns() > 0) {
+                // Already handled in takeDamage! Wait, the original code had Math.round(finalDamage * 1.5).
+                // I should remove that from Card.java since it's in Entity.takeDamage now!
             }
+            if (user.getWeakTurns() > 0) {
+                finalDamage = (int)(finalDamage * 0.75);
+            }
+
             if (target != null) {
                 target.takeDamage(finalDamage);
             }
         }
 
+        if (target != null && conditionMet) {
+            if (effects.containsKey("apply_vulnerable")) {
+                target.addVulnerable(effects.get("apply_vulnerable"));
+            }
+            if (effects.containsKey("apply_weak")) {
+                target.addWeak(effects.get("apply_weak"));
+            }
+        }
 
-
-        if (effects.containsKey("block")) {
+        if (effects.containsKey("block") && conditionMet) {
             int blockAmount = effects.get("block");
             if (user instanceof Bard) {
                 Bard bard = (Bard) user;
@@ -122,12 +178,12 @@ public class Card {
             ((AshWalker) user).reduceHeat(effects.get("heat_loss"));
         }
 
-        if (effects.containsKey("energy_gain") && user instanceof Player) {
+        if (effects.containsKey("energy_gain") && user instanceof Player && conditionMet) {
             Player p = (Player) user;
             p.setEnergy(p.getEnergy() + effects.get("energy_gain"));
         }
 
-        if (effects.containsKey("draw") && user instanceof Player) {
+        if (effects.containsKey("draw") && user instanceof Player && conditionMet) {
             Player p = (Player) user;
             p.drawCards(effects.get("draw"));
         }

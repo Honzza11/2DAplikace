@@ -221,8 +221,8 @@ public class GameWindow extends JFrame {
         mapControls.setBackground(new Color(240, 218, 181)); // Match parchment
         mapControls.setBorder(BorderFactory.createEmptyBorder(5, 15, 5, 15));
 
-        mapHpLabel = new JLabel("❤️ HP: " + currentPlayer.getHealth() + " / " + currentPlayer.getMaxHealth() + "   💰 " + currentPlayer.getGold());
-        mapHpLabel.setFont(new Font("Arial", Font.BOLD, 18));
+        mapHpLabel = new JLabel("<html><font color='red'> HP: " + currentPlayer.getHealth() + " / " + currentPlayer.getMaxHealth() + "</font> | <font color='yellow'>💰 " + currentPlayer.getGold() + " Gold </font></html>");
+        mapHpLabel.setFont(new Font("Arial", Font.BOLD, 20));
         mapHpLabel.setForeground(new Color(180, 40, 40));
         mapControls.add(mapHpLabel, BorderLayout.WEST);
 
@@ -387,9 +387,15 @@ public class GameWindow extends JFrame {
         }
     }
 
+    public void updateMapHpLabel() {
+        if (mapHpLabel != null) {
+            mapHpLabel.setText("HP:"+currentPlayer.getHealth()+"/"+currentPlayer.getMaxHealth()+"|"+"GOLD:"+currentPlayer.getGold());
+        }
+    }
+
     public void showScreen(String screenName) {
-        if (screenName.equals("MAP") && mapHpLabel != null && currentPlayer != null) {
-            mapHpLabel.setText("HP: " + currentPlayer.getHealth() + " / " + currentPlayer.getMaxHealth() + "    Gold: " + currentPlayer.getGold());
+        if (screenName.equals("MAP")) {
+            updateMapHpLabel();
         }
         cardLayout.show(mainContainer, screenName);
     }

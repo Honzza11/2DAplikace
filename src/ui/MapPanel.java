@@ -9,6 +9,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseMotionAdapter;
 import java.util.List;
 
 public class MapPanel extends JPanel {
@@ -18,6 +19,8 @@ public class MapPanel extends JPanel {
     private static final int NODE_SIZE = 50;
     private static final int TIER_HEIGHT = 120;
     private static final int COL_WIDTH = 150;
+    private int panX = 0;
+    private int startPanX = 0;
 
     public MapPanel(GameWindow gameWindow, GameMap map) {
         this(gameWindow, map, true);
@@ -32,30 +35,50 @@ public class MapPanel extends JPanel {
 
         int numTiers = map.getTiers().size();
         int panelHeight = numTiers * TIER_HEIGHT + 100;
-        setPreferredSize(new Dimension(1920, panelHeight)); // Base width, will center relative to actual width
+        setPreferredSize(new Dimension(1920, panelHeight));
 
         calculateNodePositions(panelHeight);
         addNodeButtons();
+
+        addMouseListener(new MouseAdapter() {
+            @Override
+            public void mousePressed(MouseEvent e) {
+                startPanX = e.getX() - panX;
+            }
+        });
+        
+        addMouseMotionListener(new MouseMotionAdapter() {
+            @Override
+            public void mouseDragged(MouseEvent e) {
+                panX = e.getX() - startPanX;
+                updateNodePositions();
+                repaint();
+            }
+        });
 
 
         addComponentListener(new java.awt.event.ComponentAdapter() {
             @Override
             public void componentResized(java.awt.event.ComponentEvent e) {
                 calculateNodePositions(getHeight());
-                for (Component c : getComponents()) {
-                    if (c instanceof NodeButton) {
-                        MapNode node = ((NodeButton) c).node;
-                        c.setBounds(node.getX(), node.getY(), NODE_SIZE, NODE_SIZE);
-                    }
-                }
+                updateNodePositions();
                 repaint();
             }
         });
     }
 
+    private void updateNodePositions() {
+        for (Component c : getComponents()) {
+            if (c instanceof NodeButton) {
+                MapNode node = ((NodeButton) c).node;
+                c.setBounds(node.getUiX() + panX, node.getUiY(), NODE_SIZE, NODE_SIZE);
+            }
+        }
+    }
+
     private void calculateNodePositions(int panelHeight) {
         List<List<MapNode>> tiers = gameMap.getTiers();
-        int currentWidth = Math.max(1600, getWidth()); // Ensure a minimum width for centering
+        int currentWidth = Math.max(1600, getWidth());
         
         for (int t = 0; t < tiers.size(); t++) {
             List<MapNode> tier = tiers.get(t);
@@ -86,7 +109,7 @@ public class MapPanel extends JPanel {
 
                 int offsetX = (size - NODE_SIZE) / 2;
                 int offsetY = (size - NODE_SIZE) / 2;
-                btn.setBounds(node.getUiX() - offsetX, node.getUiY() - offsetY, size, size);
+                btn.setBounds(node.getUiX() - offsetX + panX, node.getUiY() - offsetY, size, size);
                 
                 add(btn);
             }
@@ -106,11 +129,11 @@ public class MapPanel extends JPanel {
 
         for (List<MapNode> tier : gameMap.getTiers()) {
             for (MapNode node : tier) {
-                int startX = node.getUiX() + NODE_SIZE / 2;
+                int startX = node.getUiX() + NODE_SIZE / 2 + panX;
                 int startY = node.getUiY() + NODE_SIZE / 2;
 
                 for (MapNode next : node.getNextNodes()) {
-                    int endX = next.getUiX() + NODE_SIZE / 2;
+                    int endX = next.getUiX() + NODE_SIZE / 2 + panX;
                     int endY = next.getUiY() + NODE_SIZE / 2;
                     g2.drawLine(startX, startY, endX, endY);
                 }

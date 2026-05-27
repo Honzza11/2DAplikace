@@ -115,6 +115,8 @@ public class CombatPanel extends JPanel {
                         player.getDeck().addAll(player.getDiscardPile());
                         player.getHand().clear();
                         player.getDiscardPile().clear();
+                        player.resetBlock();
+                        player.clearStatuses();
                         
                         boolean isElite = enemy.getName().toLowerCase().contains("elite");
                         gameWindow.showCombatReward(isElite);
@@ -227,15 +229,19 @@ public class CombatPanel extends JPanel {
         int battleHeight = (int)(h * 0.7);
         
 
-        drawEntity(g2, player.getName(), (int)(w * 0.3) - 100, battleHeight - 370, player.getHealth(), player.getMaxHealth(), player.getBlock(), Color.CYAN);
+        drawEntity(g2, player, (int)(w * 0.3) - 100, battleHeight - 370, Color.CYAN);
         
 
         if (enemy != null) {
-            drawEntity(g2, enemy.getName(), (int)(w * 0.7) - 100, battleHeight - 370, enemy.getHealth(), enemy.getMaxHealth(), enemy.getBlock(), Color.RED);
+            drawEntity(g2, enemy, (int)(w * 0.7) - 100, battleHeight - 370, Color.RED);
         }
     }
 
-    private void drawEntity(Graphics2D g2, String name, int x, int y, int hp, int maxHp, int block, Color color) {
+    private void drawEntity(Graphics2D g2, Entity entity, int x, int y, Color color) {
+        String name = entity.getName();
+        int hp = entity.getHealth();
+        int maxHp = entity.getMaxHealth();
+        int block = entity.getBlock();
 
         g2.setColor(new Color(0, 0, 0, 100));
         g2.fillOval(x - 15, y + 285, 230, 25);
@@ -267,10 +273,11 @@ public class CombatPanel extends JPanel {
         g2.drawString(name, nameX, nameY);
 
 
-        if (enemy != null && name.equals(enemy.getName())) {
+        if (entity instanceof Enemy) {
+            Enemy e = (Enemy) entity;
             g2.setColor(new Color(255, 200, 0));
             g2.setFont(new Font("Arial", Font.ITALIC, 18));
-            String intentStr = "Intent: " + enemy.getIntentDescription();
+            String intentStr = "Intent: " + e.getIntentDescription();
             FontMetrics fmIntent = g2.getFontMetrics();
             int intentX = x + (200 - fmIntent.stringWidth(intentStr)) / 2;
             g2.drawString(intentStr, intentX, y - 90);
@@ -307,6 +314,24 @@ public class CombatPanel extends JPanel {
             int textX = (x - 33) + (28 - fm.stringWidth(blockStr)) / 2;
             int textY = (y - 44) + ((28 - fm.getHeight()) / 2) + fm.getAscent();
             g2.drawString(blockStr, textX, textY);
+        }
+        
+        int statusY = y - 75;
+        int statusX = x;
+        if (entity.getVulnerableTurns() > 0) {
+            g2.setColor(new Color(150, 0, 200));
+            g2.fillRoundRect(statusX, statusY, 24, 24, 4, 4);
+            g2.setColor(Color.WHITE);
+            g2.setFont(new Font("Arial", Font.BOLD, 12));
+            g2.drawString("V" + entity.getVulnerableTurns(), statusX + 4, statusY + 16);
+            statusX += 30;
+        }
+        if (entity.getWeakTurns() > 0) {
+            g2.setColor(new Color(100, 150, 50));
+            g2.fillRoundRect(statusX, statusY, 24, 24, 4, 4);
+            g2.setColor(Color.WHITE);
+            g2.setFont(new Font("Arial", Font.BOLD, 12));
+            g2.drawString("W" + entity.getWeakTurns(), statusX + 4, statusY + 16);
         }
     }
 
@@ -457,9 +482,17 @@ public class CombatPanel extends JPanel {
 
         if (player instanceof AshWalker) {
             AshWalker ash = (AshWalker) player;
-            g2.setColor(Color.WHITE);
-            g2.setFont(new Font("Arial", Font.BOLD, 16));
-            g2.drawString("Heat: " + ash.getHeat(), 50, uiStartY + 60);
+            int heat = ash.getHeat();
+            int bonusDmg = ash.getDamageBonus();
+            
+            g2.setFont(new Font("Arial", Font.BOLD, 18));
+            if (heat <= 10) {
+                g2.setColor(Color.ORANGE);
+                g2.drawString("Heat: " + heat + " (Damage Bonus: +" + bonusDmg + ")", 50, uiStartY + 60);
+            } else {
+                g2.setColor(Color.RED);
+                g2.drawString("OVERHEAT! Heat: " + heat + " (Will take 5 DMG, Bonus: +" + bonusDmg + ")", 50, uiStartY + 60);
+            }
         }
 
         if (player instanceof Bard) {
@@ -468,11 +501,11 @@ public class CombatPanel extends JPanel {
 
             g2.setColor(Color.WHITE);
             g2.setFont(new Font("Arial", Font.BOLD, 16));
-            g2.drawString("Chord:", 20, 90);
+            g2.drawString("Song Bar:", 20, 90);
 
             int startX = 20;
-            int y = 100;
-            int circle = 14;
+            int cy = 100;
+            int circle = 16;
             int chordSize = 3;
             for (int i = 0; i < chordSize; i++) {
                 int cx = startX + i * 26;
@@ -485,12 +518,36 @@ public class CombatPanel extends JPanel {
                     if (t == Bard.Tone.GREEN) fill = new Color(70, 200, 120);
                 }
                 g2.setColor(new Color(0, 0, 0, 120));
-                g2.fillOval(cx + 2, y + 2, circle, circle);
+                g2.fillOval(cx + 2, cy + 2, circle, circle);
                 g2.setColor(fill);
-                g2.fillOval(cx, y, circle, circle);
+                g2.fillOval(cx, cy, circle, circle);
                 g2.setColor(Color.WHITE);
-                g2.drawOval(cx, y, circle, circle);
+                g2.drawOval(cx, cy, circle, circle);
             }
+            
+            // Active Rhythm Tracker
+            g2.setFont(new Font("Arial", Font.PLAIN, 14));
+            g2.setColor(new Color(220, 220, 220));
+            g2.drawString("Last Note: " + (tones.isEmpty() ? "None" : tones.get(tones.size() - 1)), 20, 135);
+            
+            // Combo Cheat Sheet
+            int comboX = w - 280;
+            int comboY = 80;
+            g2.setColor(new Color(0, 0, 0, 150));
+            g2.fillRoundRect(comboX, comboY, 260, 100, 10, 10);
+            g2.setColor(new Color(150, 150, 150));
+            g2.drawRoundRect(comboX, comboY, 260, 100, 10, 10);
+            
+            g2.setColor(Color.WHITE);
+            g2.setFont(new Font("Arial", Font.BOLD, 14));
+            g2.drawString("Combo Cheat Sheet", comboX + 10, comboY + 20);
+            g2.setFont(new Font("Arial", Font.PLAIN, 12));
+            g2.setColor(new Color(255, 100, 100));
+            g2.drawString("🔴🔴🔴: Destructive Anthem (14 DMG)", comboX + 10, comboY + 45);
+            g2.setColor(new Color(100, 200, 255));
+            g2.drawString("🔵🔵🔵: Serenity Lullaby (12 BLK, Weak)", comboX + 10, comboY + 65);
+            g2.setColor(new Color(100, 255, 150));
+            g2.drawString("Mixed / 🟢🟢🟢: Resonant Echo (+1 EN, 1 Card)", comboX + 10, comboY + 85);
         }
 
     }

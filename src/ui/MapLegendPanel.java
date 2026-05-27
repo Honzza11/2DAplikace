@@ -41,10 +41,14 @@ public class MapLegendPanel extends JPanel {
 
     private void drawLegendItem(Graphics2D g2, String symbol, String desc, int x, int y) {
         g2.setColor(Color.DARK_GRAY);
-        g2.fillOval(x, y - 15, 20, 20);
+        g2.fillOval(x, y - 18, 24, 24);
         g2.setColor(Color.WHITE);
-        g2.drawString(symbol, x + 5, y);
+        FontMetrics fm = g2.getFontMetrics();
+        int textX = x + (24 - fm.stringWidth(symbol)) / 2;
+        int textY = (y - 18) + ((24 - fm.getHeight()) / 2) + fm.getAscent();
+        g2.drawString(symbol, textX, textY);
         g2.setColor(Color.BLACK);
-        g2.drawString(desc, x + 30, y);
+        g2.setFont(new Font("Arial", Font.BOLD, 14));
+        g2.drawString(desc, x + 35, y - 2);
     }
 }

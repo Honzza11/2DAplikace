@@ -48,12 +48,22 @@ public class CardLoader {
         addEffectIfPresent(data, "damage", card);
         addEffectIfPresent(data, "block", card);
         addEffectIfPresent(data, "heat_gain", card);
+        addEffectIfPresent(data, "apply_vulnerable", card);
+        addEffectIfPresent(data, "apply_weak", card);
         addEffectIfPresent(data, "heat_loss", card);
         addEffectIfPresent(data, "rhythm_bonus_damage", card);
         addEffectIfPresent(data, "rhythm_bonus_block", card);
-        addEffectIfPresent(data, "echo", card);
         addEffectIfPresent(data, "energy_gain", card);
         addEffectIfPresent(data, "draw", card);
+        addEffectIfPresent(data, "echo", card);
+        addEffectIfPresent(data, "heal", card);
+        addEffectIfPresent(data, "consume_heat_for_block", card);
+        addEffectIfPresent(data, "heat_bonus_damage", card);
+        addEffectIfPresent(data, "condition_heat_max", card);
+        addEffectIfPresent(data, "condition_heat_min", card);
+        addEffectIfPresent(data, "condition_heat", card);
+        addEffectIfPresent(data, "condition_bonus_damage", card);
+        addEffectIfPresent(data, "multi_attack", card);
 
         addUpgradeEffectIfPresent(data, "damage", card);
         addUpgradeEffectIfPresent(data, "block", card);

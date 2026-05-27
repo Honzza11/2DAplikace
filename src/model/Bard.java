@@ -70,7 +70,7 @@ public class Bard extends Player {
 
         if (allRed) {
 
-            int songDamage = 28;
+            int songDamage = 14;
             enemy.takeDamage(songDamage);
             System.out.println("♪ SONG: Destructive Anthem! (" + songDamage + " damage)");
             return;
@@ -78,15 +78,15 @@ public class Bard extends Player {
 
         if (allBlue) {
 
-            int songBlock = 22;
+            int songBlock = 12;
             addBlock(songBlock);
-            enemy.applyWeakness(2);
-            System.out.println("♪ SONG: Serenity Lullaby! (" + songBlock + " block, Weakness 2)");
+            enemy.applyWeakness(1);
+            System.out.println("♪ SONG: Serenity Lullaby! (" + songBlock + " block, Weakness 1)");
             return;
         }
 
-        int energyGain = 2;
-        int drawAmount = 2;
+        int energyGain = 1;
+        int drawAmount = 1;
         setEnergy(getEnergy() + energyGain);
         drawCards(drawAmount);
         System.out.println("♪ SONG: Resonant Echo! (+" + energyGain + " energy, +" + drawAmount + " cards)");
