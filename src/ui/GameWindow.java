@@ -221,9 +221,9 @@ public class GameWindow extends JFrame {
         mapControls.setBackground(new Color(240, 218, 181)); // Match parchment
         mapControls.setBorder(BorderFactory.createEmptyBorder(5, 15, 5, 15));
 
-        mapHpLabel = new JLabel("<html><font color='red'> HP: " + currentPlayer.getHealth() + " / " + currentPlayer.getMaxHealth() + "</font> | <font color='yellow'>💰 " + currentPlayer.getGold() + " Gold </font></html>");
+        mapHpLabel = new JLabel("HP: " + currentPlayer.getHealth() + " / " + currentPlayer.getMaxHealth() + "💰 " + currentPlayer.getGold() + " Gold");
         mapHpLabel.setFont(new Font("Arial", Font.BOLD, 20));
-        mapHpLabel.setForeground(new Color(180, 40, 40));
+        mapHpLabel.setForeground(new Color(0, 0, 0));
         mapControls.add(mapHpLabel, BorderLayout.WEST);
 
         JPanel buttonsPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 0));
@@ -389,7 +389,7 @@ public class GameWindow extends JFrame {
 
     public void updateMapHpLabel() {
         if (mapHpLabel != null) {
-            mapHpLabel.setText("HP:"+currentPlayer.getHealth()+"/"+currentPlayer.getMaxHealth()+"|"+"GOLD:"+currentPlayer.getGold());
+            mapHpLabel.setText("HP:"+currentPlayer.getHealth()+"/"+currentPlayer.getMaxHealth()+" | "+"GOLD: "+currentPlayer.getGold());
         }
     }
 

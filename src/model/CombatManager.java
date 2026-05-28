@@ -16,8 +16,8 @@ public class CombatManager {
     public void startCombat() {
         System.out.println("\n=== COMBAT STARTED vs " + enemy.getName() + " ===");
         player.setAttackedThisCombat(false);
+        player.clearStatuses();
         player.startTurn();
-        
 
         for (Relic r : player.getRelics()) {
             if (r.getName().equalsIgnoreCase("Anchor")) {
@@ -32,11 +32,10 @@ public class CombatManager {
         }
     }
 
-
     public void endPlayerTurn() {
         System.out.println("\n--- Player ends turn ---");
         player.discardHand();
-        
+
         if (player instanceof AshWalker) {
             ((AshWalker) player).endTurn();
         }
@@ -49,12 +48,12 @@ public class CombatManager {
         if (enemy.isDead()) return;
 
         System.out.println("\n--- Enemy turn (" + enemy.getName() + ") ---");
-
+        enemy.resetBlock();
         enemy.takeTurn(player);
-        
+
         turnCount++;
         isPlayerTurn = true;
-        player.startTurn();
+        player.startTurn(); 
         System.out.println("\n=== Turn " + turnCount + " (Player) ===");
     }
 

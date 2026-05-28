@@ -6,7 +6,7 @@ public class Enemy extends Entity {
     public enum IntentType {
         ATTACK, BLOCK, DEBUFF
     }
-    
+
     private IntentType currentIntent;
     private int intentValue;
     private String intentDescription;
@@ -19,7 +19,7 @@ public class Enemy extends Entity {
     public void decideIntent() {
         Random rand = new Random();
         int roll = rand.nextInt(100);
-        
+
         if (roll < 60) {
             currentIntent = IntentType.ATTACK;
             intentValue = 6 + rand.nextInt(5);
@@ -43,20 +43,26 @@ public class Enemy extends Entity {
     }
 
     public void takeTurn(Player player) {
+
+        this.resetBlock();
+
         System.out.println(name + " performs: " + intentDescription);
-        
+
         if (currentIntent == IntentType.ATTACK) {
             player.takeDamage(getCalculatedDamage(intentValue));
         } else if (currentIntent == IntentType.BLOCK) {
             this.addBlock(intentValue);
         } else if (currentIntent == IntentType.DEBUFF) {
+            // 🌟 TRIK: Přidáme o 1 kolo navíc (+ 1), protože víme,
+            // že herní smyčka mu hned na startu jeho tahu jedno kolo odečte.
+            // Tím pádem mu do nového kola zbyde přesně ta správná hodnota!
             if (intentDescription.contains("Vulnerable")) {
-                player.addVulnerable(intentValue);
+                player.addVulnerable(intentValue + 1);
             } else {
-                player.addWeak(intentValue);
+                player.addWeak(intentValue + 1);
             }
         }
-        
+
         decrementStatuses();
         decideIntent();
     }

@@ -1,6 +1,5 @@
 package model;
 
-
 import java.util.HashMap;
 import java.util.Map;
 
@@ -15,7 +14,7 @@ public class Card {
     protected CardType type;
     protected Map<String, Integer> effects;
     protected String heroClass;
-    
+
     protected boolean isUpgraded = false;
     protected Map<String, Integer> upgradeEffects;
     protected String upgradeDescription;
@@ -44,11 +43,10 @@ public class Card {
         this.upgradeCostOverride = other.upgradeCostOverride;
     }
 
-
     public void addEffect(String key, int value) {
         effects.put(key, value);
     }
-    
+
     public void addUpgradeEffect(String key, int value) {
         upgradeEffects.put(key, value);
     }
@@ -102,16 +100,10 @@ public class Card {
             }
         }
 
+
         if (effects.containsKey("damage")) {
             int finalDamage = effects.get("damage");
-            if (!conditionMet && effects.containsKey("condition_heat")) {
-                // If condition failed, absolute zero falls back to 6. Let's do a hardcode fallback or assume it just doesn't get bonus.
-                // Wait, "V opačném případě způsobí jen 6 DMG." 
-                // Let's just handle it via conditionMet. If condition failed and we have base damage, we can deal a smaller damage?
-                // For simplicity, if condition_heat fails, we'll just deal the base damage. If it succeeds, we deal base + something?
-                // Actually, let's just make Absolute Zero have base damage 6, and if condition meets, it adds 12 damage. We need "conditional_bonus_damage".
-                // I will add "condition_bonus_damage".
-            }
+
             if (conditionMet && effects.containsKey("condition_bonus_damage")) {
                 finalDamage += effects.get("condition_bonus_damage");
             }
@@ -136,10 +128,8 @@ public class Card {
                     System.out.println("♪ Relic: Akabeko deals +8 additional damage!");
                 }
             }
-            if (target instanceof Enemy && target.getVulnerableTurns() > 0) {
-                // Already handled in takeDamage! Wait, the original code had Math.round(finalDamage * 1.5).
-                // I should remove that from Card.java since it's in Entity.takeDamage now!
-            }
+
+
             if (user.getWeakTurns() > 0) {
                 finalDamage = (int)(finalDamage * 0.75);
             }
@@ -149,12 +139,25 @@ public class Card {
             }
         }
 
+
         if (target != null && conditionMet) {
             if (effects.containsKey("apply_vulnerable")) {
-                target.addVulnerable(effects.get("apply_vulnerable"));
+                int amount = effects.get("apply_vulnerable");
+
+                if (user instanceof Player) {
+                    target.addVulnerable(amount + 1);
+                } else {
+                    target.addVulnerable(amount);
+                }
             }
             if (effects.containsKey("apply_weak")) {
-                target.addWeak(effects.get("apply_weak"));
+                int amount = effects.get("apply_weak");
+
+                if (user instanceof Player) {
+                    target.addWeak(amount + 1);
+                } else {
+                    target.addWeak(amount);
+                }
             }
         }
 
@@ -168,7 +171,6 @@ public class Card {
             }
             user.addBlock(blockAmount);
         }
-
 
         if (effects.containsKey("heat_gain") && user instanceof AshWalker) {
             ((AshWalker) user).addHeat(effects.get("heat_gain"));
@@ -196,19 +198,19 @@ public class Card {
     public CardType getType() { return type; }
     public String getHeroClass() { return heroClass; }
     public boolean isUpgraded() { return isUpgraded; }
-    
+
     public void upgrade() {
         if (!isUpgraded) {
             isUpgraded = true;
             name += "+";
-            
+
             if (upgradeDescription != null) {
                 description = upgradeDescription;
             }
             if (upgradeCostOverride != null) {
                 cost = upgradeCostOverride;
             }
-            
+
             for (Map.Entry<String, Integer> entry : upgradeEffects.entrySet()) {
                 String key = entry.getKey();
                 int upgradeAmount = entry.getValue();

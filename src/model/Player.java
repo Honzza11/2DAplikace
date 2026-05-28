@@ -4,18 +4,16 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-
 public class Player extends Entity {
     private int energy;
     private int maxEnergy;
-    
+
     private List<Card> deck;
     private List<Card> hand;
     private List<Card> discardPile;
     private List<Relic> relics;
     private boolean attackedThisCombat;
     private int gold;
-
 
     public Player(String name, int maxHp, int maxEnergy) {
         super(name, maxHp);
@@ -30,9 +28,18 @@ public class Player extends Entity {
     }
 
     public void startTurn() {
+        // Hned na startu kola se odečte to "kolo navíc", které nepřítel přidal,
+        // a hráči zůstane debuff přesně na tolik kol, na kolik měl!
+        decrementStatuses();
+
         energy = maxEnergy;
         resetBlock();
         drawCards(5);
+    }
+
+    @Override
+    public void clearStatuses() {
+        super.clearStatuses();
     }
 
     public void drawCards(int amount) {
@@ -61,11 +68,11 @@ public class Player extends Entity {
         if (canAfford(card) && hand.contains(card)) {
             useEnergy(card.getCost());
             hand.remove(card);
-            
+
             System.out.println(name + " plays " + card.getName());
             card.play(this, target);
             onCardPlayed(card, target);
-            
+
             discardPile.add(card);
             return true;
         }
@@ -73,39 +80,26 @@ public class Player extends Entity {
         return false;
     }
 
-    public void onCardPlayed(Card card, Entity target) {
+    public void onCardPlayed(Card card, Entity target) {}
 
-    }
-
-    public boolean canAfford(Card card) {
-        return energy >= card.getCost();
-    }
-
-    public void useEnergy(int amount) {
-        energy -= amount;
-    }
+    public boolean canAfford(Card card) { return energy >= card.getCost(); }
+    public void useEnergy(int amount) { energy -= amount; }
 
     public void setDeck(List<Card> newDeck) {
         this.deck = new ArrayList<>(newDeck);
         Collections.shuffle(this.deck);
     }
 
-    public void shuffleDeck() {
-        Collections.shuffle(deck);
-    }
-
-    public void setEnergy(int energy) {
-        this.energy = energy;
-    }
+    public void shuffleDeck() { Collections.shuffle(deck); }
+    public void setEnergy(int energy) { this.energy = energy; }
 
     public int getEnergy() { return energy; }
     public int getMaxEnergy() { return maxEnergy; }
     public List<Card> getDeck() { return deck; }
     public List<Card> getHand() { return hand; }
     public List<Card> getDiscardPile() { return discardPile; }
-    
     public List<Relic> getRelics() { return relics; }
-    
+
     public void addRelic(Relic relic) {
         relics.add(relic);
         if (relic.getName().equalsIgnoreCase("Strawberry")) {
@@ -113,21 +107,17 @@ public class Player extends Entity {
             this.hp = Math.min(this.maxHp, this.hp + 10);
         }
     }
-    
+
     public boolean hasRelic(String relicName) {
         for (Relic r : relics) {
-            if (r.getName().equalsIgnoreCase(relicName)) {
-                return true;
-            }
+            if (r.getName().equalsIgnoreCase(relicName)) return true;
         }
         return false;
     }
-    
+
     public boolean hasAttackedThisCombat() { return attackedThisCombat; }
     public void setAttackedThisCombat(boolean attacked) { this.attackedThisCombat = attacked; }
-    
     public int getGold() { return gold; }
     public void addGold(int amount) { this.gold += amount; }
     public void removeGold(int amount) { this.gold = Math.max(0, this.gold - amount); }
 }
-

@@ -6,8 +6,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class CardLoader {
-    
-
     public static List<Card> loadCards(String filePath) {
         List<Card> cards = new ArrayList<>();
         try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
@@ -22,7 +20,7 @@ public class CardLoader {
             while ((index = json.indexOf("{", index)) != -1) {
                 int end = json.indexOf("}", index);
                 if (end == -1) break;
-                
+
                 String data = json.substring(index + 1, end);
                 parseCard(data, cards);
                 index = end + 1;
@@ -39,11 +37,10 @@ public class CardLoader {
         String desc = getField(data, "description");
         String typeStr = getField(data, "type");
         String heroClass = getField(data, "heroClass");
-        
+
         if (name == null || typeStr == null) return;
 
         Card card = new Card(name, cost, desc, Card.CardType.valueOf(typeStr.toUpperCase()), heroClass);
-        
 
         addEffectIfPresent(data, "damage", card);
         addEffectIfPresent(data, "block", card);
@@ -74,10 +71,10 @@ public class CardLoader {
         addUpgradeEffectIfPresent(data, "echo", card);
         addUpgradeEffectIfPresent(data, "energy_gain", card);
         addUpgradeEffectIfPresent(data, "draw", card);
-        
+
         String upDesc = getField(data, "upgrade_description");
         if (upDesc != null) card.setUpgradeDescription(upDesc);
-        
+
         String upCost = getField(data, "upgrade_cost");
         if (upCost != null) {
             try {
