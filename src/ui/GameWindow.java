@@ -28,7 +28,7 @@ public class GameWindow extends JFrame {
         cardLayout = new CardLayout();
         mainContainer = new JPanel(cardLayout);
 
-        BackgroundPanel menuPanel = new BackgroundPanel("Res/catle pozadi1.png");
+        BackgroundPanel menuPanel = new BackgroundPanel("Res/title pozadi.jpg");
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.gridx = 0;
         
@@ -94,9 +94,7 @@ public class GameWindow extends JFrame {
         // 🌟 ENGLISH TEXT FOR BARD
         String bardDesc = "Tactical & Defensive.\n\n"
                 + "RHYTHM & NOTES MECHANIC:\n"
-                + "Playing cards composes songs. Each card adds an Attack or Skill note to your active bar.\n\n"
-                + "RHYTHM EFFECT:\n"
-                + "Many of your cards gain massive bonuses to damage or Block if played in rhythm – meaning if the currently played card is a different type (Attack/Skill) than the previous one. Compose your tones wisely!";
+                + "Playing cards composes songs. Each card adds an Attack or Skill note to your active bar.\n\n";
 
         heroesBox.add(createHeroOption("Ash Walker", ashWalkerDesc, "ASH_WALKER"));
         heroesBox.add(createHeroOption("Bard", bardDesc, "BARD"));

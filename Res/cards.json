@@ -39,24 +39,24 @@
     "name": "Soul Melody",
     "cost": 1,
     "type": "SKILL",
-    "description": "Gain 5 Block. Rhythm: if the previous card was a different type, draw 1 card.",
-    "block": 5,
-    "rhythm_draw": 1,
+    "description": "Gain 6 Block. Draw 1 card.",
+    "block": 6,
+    "draw": 1,
     "heroClass": "Bard",
     "upgrade_block": 3,
-    "upgrade_description": "Gain 8 Block. Rhythm: if the previous card was a different type, draw 1 card."
+    "upgrade_description": "Gain 9 Block. Draw 1 card."
   },
   {
     "id": "dangerous_note",
     "name": "Dangerous Note",
     "cost": 1,
     "type": "ATTACK",
-    "description": "Deal 6 damage. Rhythm: if the previous card was a different type, apply 1 Vulnerable.",
+    "description": "Deal 6 damage. Apply 1 Vulnerable.",
     "damage": 6,
-    "rhythm_apply_vulnerable": 1,
+    "apply_vulnerable": 1,
     "heroClass": "Bard",
     "upgrade_damage": 3,
-    "upgrade_description": "Deal 9 damage. Rhythm: if the previous card was a different type, apply 1 Vulnerable."
+    "upgrade_description": "Deal 9 damage. Apply 1 Vulnerable."
   },
   {
     "id": "obsidian_dagger",
@@ -128,26 +128,24 @@
     "name": "War Dirge",
     "cost": 2,
     "type": "ATTACK",
-    "description": "Deal 6 damage. Rhythm: if the previous card was a different type, deal +3 damage.",
-    "damage": 6,
-    "rhythm_bonus_damage": 3,
+    "description": "Deal 10 damage. Draw 2 cards.",
+    "damage": 10,
+    "draw": 2,
     "heroClass": "Bard",
-    "upgrade_damage": 2,
-    "upgrade_rhythm_bonus_damage": 2,
-    "upgrade_description": "Deal 8 damage. Rhythm bonus +5 damage."
+    "upgrade_damage": 4,
+    "upgrade_description": "Deal 14 damage. Draw 2 cards."
   },
   {
     "id": "shadow_lullaby",
     "name": "Shadow Lullaby",
     "cost": 2,
     "type": "SKILL",
-    "description": "Gain 6 Block. Rhythm: if the previous card was a different type, gain +4 Block.",
-    "block": 6,
-    "rhythm_bonus_block": 4,
+    "description": "Gain 12 Block. Apply 2 Weak.",
+    "block": 12,
+    "apply_weak": 2,
     "heroClass": "Bard",
-    "upgrade_block": 2,
-    "upgrade_rhythm_bonus_block": 2,
-    "upgrade_description": "Gain 8 Block. Rhythm bonus +6 Block."
+    "upgrade_block": 4,
+    "upgrade_description": "Gain 16 Block. Apply 2 Weak."
   },
   {
     "id": "hush_guard",
@@ -277,24 +275,22 @@
     "name": "Quick Prelude",
     "cost": 0,
     "type": "SKILL",
-    "description": "Gain 3 Block. Rhythm: if the previous card was a different type, gain 1 Energy.",
-    "block": 3,
-    "rhythm_energy_gain": 1,
+    "description": "Gain 4 Block.",
+    "block": 4,
     "heroClass": "Bard",
-    "upgrade_block": 2,
-    "upgrade_description": "Gain 5 Block. Rhythm: if the previous card was a different type, gain 1 Energy."
+    "upgrade_block": 3,
+    "upgrade_description": "Gain 7 Block."
   },
   {
     "id": "double_staccato",
     "name": "Double Staccato",
     "cost": 2,
     "type": "ATTACK",
-    "description": "Deal 4 damage 2 times. Rhythm: if the previous card was a different type, attack 3 times instead.",
-    "damage": 4,
+    "description": "Deal 5 damage 2 times.",
+    "damage": 5,
     "multi_attack": 2,
-    "rhythm_multi_attack": 3,
     "heroClass": "Bard",
     "upgrade_damage": 2,
-    "upgrade_description": "Deal 6 damage 2 times. Rhythm: if the previous card was a different type, attack 3 times instead."
+    "upgrade_description": "Deal 7 damage 2 times."
   }
 ]

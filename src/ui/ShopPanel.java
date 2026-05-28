@@ -16,14 +16,15 @@ public class ShopPanel extends JPanel {
     private List<CardSale> cardsForSale;
     private boolean cardRemovalAvailable = true;
     private int removalCost = 75;
-    
+
     private JLabel goldLabel;
-    
+    private Image backgroundImage;
+
     private static class CardSale {
         Card card;
         int price;
         boolean sold = false;
-        
+
         CardSale(Card card, int price) {
             this.card = card;
             this.price = price;
@@ -34,45 +35,48 @@ public class ShopPanel extends JPanel {
         this.gameWindow = gameWindow;
         this.player = player;
         this.cardsForSale = new ArrayList<>();
-        
+
+        try {
+            backgroundImage = new ImageIcon("Res/medieval_shop.jpg").getImage();
+        } catch (Exception e) {
+            System.err.println("Could not load shop background: " + e.getMessage());
+        }
+
         generateShopInventory();
-        
+
         setLayout(new BorderLayout());
-        setBackground(new Color(25, 20, 15)); // Dark shop background
-        
-        // Top Panel: Title and Gold
+        setBackground(new Color(25, 20, 15));
+
         JPanel topPanel = new JPanel(new BorderLayout());
         topPanel.setOpaque(false);
         topPanel.setBorder(BorderFactory.createEmptyBorder(20, 50, 20, 50));
-        
+
         JLabel titleLabel = new JLabel("Merchant");
         titleLabel.setFont(new Font("Arial", Font.BOLD, 48));
         titleLabel.setForeground(Color.ORANGE);
         topPanel.add(titleLabel, BorderLayout.WEST);
-        
+
         goldLabel = new JLabel("💰 " + player.getGold() + " Gold");
         goldLabel.setFont(new Font("Arial", Font.BOLD, 36));
         goldLabel.setForeground(Color.YELLOW);
         topPanel.add(goldLabel, BorderLayout.EAST);
-        
+
         add(topPanel, BorderLayout.NORTH);
-        
-        // Center: Items for sale
+
         JPanel centerPanel = new JPanel();
         centerPanel.setLayout(new BoxLayout(centerPanel, BoxLayout.Y_AXIS));
         centerPanel.setOpaque(false);
-        
+
         JPanel cardsPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 40, 20));
         cardsPanel.setOpaque(false);
-        
+
         for (CardSale sale : cardsForSale) {
             cardsPanel.add(createCardSalePanel(sale));
         }
-        
+
         centerPanel.add(Box.createVerticalStrut(50));
         centerPanel.add(cardsPanel);
-        
-        // Removal Option
+
         JPanel removalPanel = new JPanel();
         removalPanel.setOpaque(false);
         JButton removeBtn = new JButton("Remove a Card (Costs " + removalCost + " 💰)");
@@ -80,7 +84,7 @@ public class ShopPanel extends JPanel {
         removeBtn.setBackground(new Color(150, 50, 50));
         removeBtn.setForeground(Color.WHITE);
         removeBtn.setFocusPainted(false);
-        
+
         removeBtn.addActionListener(e -> {
             if (cardRemovalAvailable && player.getGold() >= removalCost) {
                 gameWindow.showRemoveDialog(card -> {
@@ -95,14 +99,13 @@ public class ShopPanel extends JPanel {
                 JOptionPane.showMessageDialog(this, "Not enough gold!");
             }
         });
-        
+
         removalPanel.add(removeBtn);
         centerPanel.add(Box.createVerticalStrut(50));
         centerPanel.add(removalPanel);
-        
+
         add(centerPanel, BorderLayout.CENTER);
-        
-        // Bottom: Leave Button
+
         JPanel bottomPanel = new JPanel();
         bottomPanel.setOpaque(false);
         bottomPanel.setBorder(BorderFactory.createEmptyBorder(0, 0, 50, 0));
@@ -113,14 +116,14 @@ public class ShopPanel extends JPanel {
         leaveBtn.setFocusPainted(false);
         leaveBtn.addActionListener(e -> gameWindow.showScreen("MAP"));
         bottomPanel.add(leaveBtn);
-        
+
         add(bottomPanel, BorderLayout.SOUTH);
     }
-    
+
     private void generateShopInventory() {
         List<Card> allCards = CardLoader.loadCards("Res/cards.json");
         if (allCards == null || allCards.isEmpty()) return;
-        
+
         List<Card> validCards = new ArrayList<>();
         String playerClass = player.getClass().getSimpleName();
         for (Card c : allCards) {
@@ -128,7 +131,7 @@ public class ShopPanel extends JPanel {
                 validCards.add(c);
             }
         }
-        
+
         java.util.Collections.shuffle(validCards);
         Random rand = new Random();
         for (int i = 0; i < Math.min(3, validCards.size()); i++) {
@@ -136,23 +139,22 @@ public class ShopPanel extends JPanel {
             cardsForSale.add(new CardSale(new Card(validCards.get(i)), price));
         }
     }
-    
+
     private JPanel createCardSalePanel(CardSale sale) {
         JPanel panel = new JPanel(new BorderLayout());
         panel.setOpaque(false);
-        
-        // Wrap the single card in a DeckPanel so it renders nicely!
+
         List<Card> singleCardList = new ArrayList<>();
         singleCardList.add(sale.card);
         DeckPanel cardRenderer = new DeckPanel(singleCardList);
         cardRenderer.setPreferredSize(new Dimension(170, 225));
         panel.add(cardRenderer, BorderLayout.CENTER);
-        
+
         JButton buyBtn = new JButton(sale.price + " 💰");
         buyBtn.setFont(new Font("Arial", Font.BOLD, 20));
         buyBtn.setBackground(new Color(218, 165, 32));
         buyBtn.setFocusPainted(false);
-        
+
         buyBtn.addActionListener(e -> {
             if (!sale.sold) {
                 if (player.getGold() >= sale.price) {
@@ -168,12 +170,22 @@ public class ShopPanel extends JPanel {
                 }
             }
         });
-        
+
         panel.add(buyBtn, BorderLayout.SOUTH);
         return panel;
     }
-    
+
     private void updateGoldLabel() {
         goldLabel.setText("💰 " + player.getGold() + " Gold");
+    }
+
+    @Override
+    protected void paintComponent(Graphics g) {
+        super.paintComponent(g);
+        if (backgroundImage != null) {
+            g.drawImage(backgroundImage, 0, 0, getWidth(), getHeight(), this);
+            g.setColor(new Color(0, 0, 0, 140));
+            g.fillRect(0, 0, getWidth(), getHeight());
+        }
     }
 }

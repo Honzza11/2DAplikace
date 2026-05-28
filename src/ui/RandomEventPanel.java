@@ -14,6 +14,7 @@ import java.util.Random;
 public class RandomEventPanel extends JPanel {
     private final GameWindow gameWindow;
     private final Player player;
+    private Image backgroundImage;
 
     private static class Choice {
         final String label;
@@ -84,10 +85,18 @@ public class RandomEventPanel extends JPanel {
 
         add(bottomPanel, BorderLayout.SOUTH);
 
-
         Random random = new Random();
         int eventId = random.nextInt(5);
         EventData event = buildEvent(eventId);
+
+        if (event.imagePath != null && !event.imagePath.isEmpty()) {
+            try {
+                backgroundImage = new ImageIcon(event.imagePath).getImage();
+            } catch (Exception e) {
+                System.err.println("Could not load event background: " + e.getMessage());
+                backgroundImage = null;
+            }
+        }
 
         titleLabel.setText(event.title);
         subtitleLabel.setText(event.subtitle);
@@ -116,18 +125,19 @@ public class RandomEventPanel extends JPanel {
         final String title;
         final String subtitle;
         final String text;
+        final String imagePath;
         final List<Choice> choices;
 
-        EventData(String title, String subtitle, String text, List<Choice> choices) {
+        EventData(String title, String subtitle, String text, String imagePath, List<Choice> choices) {
             this.title = title;
             this.subtitle = subtitle;
             this.text = text;
+            this.imagePath = imagePath;
             this.choices = choices;
         }
     }
 
     private EventData buildEvent(int eventId) {
-
         switch (eventId) {
             case 0:
                 return darkAltarEvent();
@@ -144,15 +154,13 @@ public class RandomEventPanel extends JPanel {
 
     private EventData darkAltarEvent() {
         int costHp = 15;
-        Relic guaranteedRelic = null;
-
         List<Choice> choices = new ArrayList<>();
         choices.add(new Choice(
                 "Sacrifice " + costHp + " HP (gain a relic)",
                 player.getHealth() > costHp,
                 () -> {
                     player.takeDamage(costHp);
-                    Relic relic = guaranteedRelic != null ? guaranteedRelic : Relic.getRandomRelic(player.getRelics());
+                    Relic relic = Relic.getRandomRelic(player.getRelics());
                     if (relic != null) player.addRelic(relic);
                 }
         ));
@@ -168,6 +176,7 @@ public class RandomEventPanel extends JPanel {
                 "Dark Altar",
                 "An unknown voice tests you...",
                 "You stand before a sinister altar. Two paths open to you: sacrifice part of your life, or risk only a brief moment of calm.",
+                "Res/dark_altar.jpg",
                 choices
         );
     }
@@ -195,6 +204,7 @@ public class RandomEventPanel extends JPanel {
                 "Lost Cache",
                 "A hand lingered here, craving neither time nor patience...",
                 "You find traces of a hidden place. It might help you, or it might simply please you for a moment.",
+                "Res/lost_cache.jpg",
                 choices
         );
     }
@@ -219,15 +229,14 @@ public class RandomEventPanel extends JPanel {
         choices.add(new Choice(
                 "Flee (nothing happens)",
                 true,
-                () -> {
-
-                }
+                () -> {}
         ));
 
         return new EventData(
                 "Cursed Shrine",
                 "Silence turns into pressure...",
                 "Red dust lies on the ground. When you breathe in, you feel the cost arriving before you can decide.",
+                "Res/cursed_shrine.jpg",
                 choices
         );
     }
@@ -257,13 +266,14 @@ public class RandomEventPanel extends JPanel {
                 "Blacksmith's Offer",
                 "Steel demands its fee.",
                 "You hear a hammer strike. The craftsman can forge a better version of a card for you, but he wants to be paid in gold.",
+                "Res/blacksmith_offer.jpg",
                 choices
         );
     }
 
     private EventData merchantDealEvent() {
         int goldCost = 35;
-        int goldGain = 25 + new Random().nextInt(16); // 25..40
+        int goldGain = 25 + new Random().nextInt(16);
         int heal = 10;
 
         List<Choice> choices = new ArrayList<>();
@@ -287,7 +297,6 @@ public class RandomEventPanel extends JPanel {
                 }
         ));
 
-        // Small free option if player can't pay.
         if (player.getGold() < goldCost) {
             choices.add(new Choice(
                     "Just take a look (nothing)",
@@ -306,6 +315,7 @@ public class RandomEventPanel extends JPanel {
                 "Odd Merchant",
                 "Fortune is a commodity that can't be weighed.",
                 "A merchant circles you, speaking faster than usual. Two deals are offered, with a third option for whatever conscience remains.",
+                "Res/odd_merchant.jpg",
                 choices
         );
     }
@@ -326,5 +336,14 @@ public class RandomEventPanel extends JPanel {
         Random random = new Random();
         return valid.get(random.nextInt(valid.size()));
     }
-}
 
+    @Override
+    protected void paintComponent(Graphics g) {
+        super.paintComponent(g);
+        if (backgroundImage != null) {
+            g.drawImage(backgroundImage, 0, 0, getWidth(), getHeight(), this);
+            g.setColor(new Color(0, 0, 0, 160));
+            g.fillRect(0, 0, getWidth(), getHeight());
+        }
+    }
+}
