@@ -28,8 +28,7 @@ public class Player extends Entity {
     }
 
     public void startTurn() {
-        // Hned na startu kola se odečte to "kolo navíc", které nepřítel přidal,
-        // a hráči zůstane debuff přesně na tolik kol, na kolik měl!
+
         decrementStatuses();
 
         energy = maxEnergy;
@@ -92,7 +91,6 @@ public class Player extends Entity {
 
     public void shuffleDeck() { Collections.shuffle(deck); }
     public void setEnergy(int energy) { this.energy = energy; }
-
     public int getEnergy() { return energy; }
     public int getMaxEnergy() { return maxEnergy; }
     public List<Card> getDeck() { return deck; }

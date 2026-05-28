@@ -29,13 +29,65 @@
     "id": "the_pyre_avatar",
     "name": "Avatar of Pyre",
     "pool": "BOSS",
-    "minHp": 200,
-    "maxHp": 220,
+    "minHp": 175,
+    "maxHp": 185,
     "imagePath": "Res/pyre_avatar.png",
     "moves": [
       { "type": "ATTACK", "chanceWeight": 60, "minVal": 20, "maxVal": 26 },
       { "type": "BLOCK", "chanceWeight": 20, "minVal": 15, "maxVal": 25 },
       { "type": "VULNERABLE", "chanceWeight": 20, "minVal": 2, "maxVal": 3 }
+    ]
+  },
+  {
+    "id": "mimic",
+    "name": "Mimic",
+    "pool": "NORMAL",
+    "minHp": 50,
+    "maxHp": 60,
+    "imagePath": "Res/mimic.png",
+    "moves": [
+      { "type": "ATTACK", "chanceWeight": 50, "minVal": 7, "maxVal": 11 },
+      { "type": "BLOCK", "chanceWeight": 30, "minVal": 6, "maxVal": 10 },
+      { "type": "WEAK", "chanceWeight": 20, "minVal": 1, "maxVal": 2 }
+    ]
+  },
+  {
+    "id": "evil_knight",
+    "name": "Evil Knight",
+    "pool": "NORMAL",
+    "minHp": 65,
+    "maxHp": 75,
+    "imagePath": "Res/evil knight2.png",
+    "moves": [
+      { "type": "ATTACK", "chanceWeight": 50, "minVal": 10, "maxVal": 14 },
+      { "type": "BLOCK", "chanceWeight": 35, "minVal": 8, "maxVal": 12 },
+      { "type": "VULNERABLE", "chanceWeight": 15, "minVal": 2, "maxVal": 2 }
+    ]
+  },
+  {
+    "id": "gargoyle",
+    "name": "Gargoyle",
+    "pool": "ELITE",
+    "minHp": 85,
+    "maxHp": 90,
+    "imagePath": "Res/gargoyle.png",
+    "moves": [
+      { "type": "ATTACK", "chanceWeight": 40, "minVal": 14, "maxVal": 18 },
+      { "type": "BLOCK", "chanceWeight": 45, "minVal": 12, "maxVal": 16 },
+      { "type": "VULNERABLE", "chanceWeight": 15, "minVal": 2, "maxVal": 2 }
+    ]
+  },
+  {
+    "id": "necromancer",
+    "name": "Necromancer",
+    "pool": "ELITE",
+    "minHp": 75,
+    "maxHp": 85,
+    "imagePath": "Res/necromancer.png",
+    "moves": [
+      { "type": "ATTACK", "chanceWeight": 50, "minVal": 10, "maxVal": 15 },
+      { "type": "WEAK", "chanceWeight": 30, "minVal": 2, "maxVal": 3 },
+      { "type": "VULNERABLE", "chanceWeight": 20, "minVal": 1, "maxVal": 2 }
     ]
   }
 ]

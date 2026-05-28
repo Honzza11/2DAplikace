@@ -41,7 +41,6 @@ public class CombatPanel extends JPanel {
                 playerImage = new ImageIcon("Res/bard111.png").getImage();
             }
 
-
             if (enemy != null) {
                 String imgPath = enemy.getImagePath();
 
@@ -111,6 +110,7 @@ public class CombatPanel extends JPanel {
                     System.out.println("Played: " + card.getName());
                     repaint();
 
+                    // 🌟 KONTROLA: Smrt nepřítele / Vítězství
                     if (enemy.isDead()) {
                         System.out.println("Enemy defeated!");
 
@@ -121,8 +121,15 @@ public class CombatPanel extends JPanel {
                         player.resetBlock();
                         player.clearStatuses();
 
-                        boolean isElite = enemy.getName().toLowerCase().contains("elite");
-                        gameWindow.showCombatReward(isElite);
+
+                        if (enemy.getName().toLowerCase().contains("boss") || enemy.getName().toLowerCase().contains("pyre")) {
+                            gameWindow.showWinScreen();
+                        } else {
+
+                            boolean isElite = enemy.getName().toLowerCase().contains("elite");
+                            gameWindow.showCombatReward(isElite);
+                        }
+                        return;
                     }
                 }
                 break;
@@ -153,14 +160,44 @@ public class CombatPanel extends JPanel {
                 ((AshWalker) player).endTurn();
             }
 
+
+            if (player.getHealth() <= 0) {
+                gameWindow.showGameOverScreen();
+                return;
+            }
+
+
             if (enemy != null && !enemy.isDead()) {
                 enemy.takeTurn(player);
+            }
+
+
+            if (player.getHealth() <= 0) {
+                gameWindow.showGameOverScreen();
+                return;
             }
 
             player.startTurn();
 
             if (player instanceof Bard && enemy != null) {
                 ((Bard) player).playEchoCards(enemy);
+
+
+                if (enemy.isDead()) {
+                    player.getDeck().addAll(player.getHand());
+                    player.getDeck().addAll(player.getDiscardPile());
+                    player.getHand().clear();
+                    player.getDiscardPile().clear();
+                    player.resetBlock();
+                    player.clearStatuses();
+
+                    if (enemy.getName().toLowerCase().contains("boss") || enemy.getName().toLowerCase().contains("pyre")) {
+                        gameWindow.showWinScreen();
+                    } else {
+                        gameWindow.showCombatReward(enemy.getName().toLowerCase().contains("elite"));
+                    }
+                    return;
+                }
             }
 
             repaint();

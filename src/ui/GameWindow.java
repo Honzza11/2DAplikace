@@ -13,7 +13,7 @@ public class GameWindow extends JFrame {
 
     private JLabel mapLabel;
     private JLabel combatLabel;
-    
+
     private Player currentPlayer;
     private JLabel mapHpLabel;
 
@@ -31,7 +31,7 @@ public class GameWindow extends JFrame {
         BackgroundPanel menuPanel = new BackgroundPanel("Res/title pozadi.jpg");
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.gridx = 0;
-        
+
         OutlinedLabel titleLabel = new OutlinedLabel("Kill The Pyre", 72);
         gbc.gridy = 0;
         gbc.weighty = 0.3;
@@ -44,7 +44,7 @@ public class GameWindow extends JFrame {
         playButton.setFocusPainted(false);
         playButton.setPreferredSize(new Dimension(250, 70));
         playButton.addActionListener(e -> showScreen("CHAR_SELECT"));
-        
+
         gbc.gridy = 1;
         gbc.weighty = 0.7;
         gbc.anchor = GridBagConstraints.CENTER;
@@ -60,10 +60,14 @@ public class GameWindow extends JFrame {
         combatLabel.setFont(new Font("Arial", Font.BOLD, 24));
         combatPanel.add(combatLabel);
 
+
         mainContainer.add(menuPanel, "MENU");
         mainContainer.add(charSelectPanel, "CHAR_SELECT");
         mainContainer.add(mapContainer, "MAP");
         mainContainer.add(combatPanel, "COMBAT");
+
+
+        mainContainer.add(new GameOverScreen(this), "GAME_OVER");
 
         add(mainContainer);
         showScreen("MENU");
@@ -71,40 +75,37 @@ public class GameWindow extends JFrame {
 
     private JPanel createCharacterSelectPanel() {
         BackgroundPanel panel = new BackgroundPanel("Res/catle pozadi1.png");
-        
+
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.gridx = 0;
         gbc.gridy = 0;
         gbc.insets = new Insets(50, 0, 20, 0);
-        
+
         OutlinedLabel title = new OutlinedLabel("Choose Your Hero", 48);
         panel.add(title, gbc);
 
         JPanel heroesBox = new JPanel(new GridLayout(1, 2, 40, 0));
         heroesBox.setOpaque(false);
 
-
-        // 🌟 ENGLISH TEXT FOR ASH WALKER
         String ashWalkerDesc = "Aggressive & Risky.\n\n"
                 + "HEAT MECHANIC:\n"
                 + "Attack cards generate Heat points, which drastically increase the damage of your subsequent attacks.\n\n"
                 + "WARNING: If your Heat exceeds the limit at the end of your turn, you will take overheat damage! "
                 + "You must strategically alternate attacks with cooling skills (like Quench & Coils) that safely reduce Heat and generate Block.";
 
-        // 🌟 ENGLISH TEXT FOR BARD
         String bardDesc = "Tactical & Defensive.\n\n"
                 + "RHYTHM & NOTES MECHANIC:\n"
                 + "Playing cards composes songs. Each card adds an Attack or Skill note to your active bar.\n\n";
 
         heroesBox.add(createHeroOption("Ash Walker", ashWalkerDesc, "ASH_WALKER"));
         heroesBox.add(createHeroOption("Bard", bardDesc, "BARD"));
-        
+
         gbc.gridy = 1;
         gbc.weighty = 1.0;
         gbc.anchor = GridBagConstraints.CENTER;
         gbc.insets = new Insets(0, 0, 50, 0);
         panel.add(heroesBox, gbc);
-        
+
         return panel;
     }
 
@@ -118,7 +119,6 @@ public class GameWindow extends JFrame {
         nameLabel.setFont(new Font("Arial", Font.BOLD, 28));
         nameLabel.setForeground(Color.WHITE);
         nameLabel.setBorder(BorderFactory.createEmptyBorder(10, 0, 5, 0));
-
 
         String imagePath = type.equals("ASH_WALKER") ? "Res/assasin.png" : "Res/bard111.png";
         ImageIcon heroIcon = null;
@@ -185,32 +185,36 @@ public class GameWindow extends JFrame {
     private void selectCharacter(String type) {
         List<Card> allCards = CardLoader.loadCards("Res/cards.json");
         List<Card> deck = new ArrayList<>();
-        
+
         if (type.equals("ASH_WALKER")) {
             currentPlayer = new AshWalker("Ash Walker", 80, 3);
-            addCardsToDeck(deck, allCards, "Strike", 4);
+            addCardsToDeck(deck, allCards, "Strike", 3);
             addCardsToDeck(deck, allCards, "Defend", 3);
-            addCardsToDeck(deck, allCards, "Cinder Strike", 1);
-            addCardsToDeck(deck, allCards, "Obsidian Dagger", 2);
+            addCardsToDeck(deck, allCards, "Cinder Strike", 2);
+            addCardsToDeck(deck, allCards, "Obsidian Dagger", 1);
+            addCardsToDeck(deck, allCards, "Quench & Coils", 1);
+            addCardsToDeck(deck, allCards, "Eruption", 1);
 
         } else {
-            currentPlayer = new Bard("Bard", 70, 3);
+            currentPlayer = new Bard("Bard", 80, 3);
             addCardsToDeck(deck, allCards, "Strike", 3);
-            addCardsToDeck(deck, allCards, "Defend", 4);
-            addCardsToDeck(deck, allCards, "Soul Melody", 1);
-            addCardsToDeck(deck, allCards, "Dangerous Note", 1);
+            addCardsToDeck(deck, allCards, "Defend", 3);
+            addCardsToDeck(deck, allCards, "Soul Melody", 2);
+            addCardsToDeck(deck, allCards, "Dangerous Note", 2);
+            addCardsToDeck(deck, allCards, "Quick Prelude", 1);
+            addCardsToDeck(deck, allCards, "Double Staccato", 1);
         }
-        
+
         currentPlayer.setDeck(deck);
         System.out.println("Selected: " + type + ". Deck size: " + deck.size());
-        
+
         generateAndShowMap();
     }
 
     private void generateAndShowMap() {
         this.currentMap = new GameMap(15, 7);
         MapPanel mapPanel = new MapPanel(this, currentMap);
-        
+
         JScrollPane scrollPane = new JScrollPane(mapPanel);
         scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
         scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
@@ -227,7 +231,7 @@ public class GameWindow extends JFrame {
 
         JPanel buttonsPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 0));
         buttonsPanel.setOpaque(false);
-        
+
         JButton deckBtn = new JButton("View Deck");
         deckBtn.setFocusPainted(false);
         deckBtn.addActionListener(e -> showDeckDialog());
@@ -257,13 +261,11 @@ public class GameWindow extends JFrame {
                 }
             }
         }
-        
+
         showScreen("MAP");
     }
 
     public void startCombat(Enemy enemy) {
-
-
         currentPlayer.setAttackedThisCombat(false);
         currentPlayer.resetBlock();
         if (currentPlayer instanceof AshWalker) {
@@ -276,7 +278,7 @@ public class GameWindow extends JFrame {
         currentPlayer.getHand().clear();
         currentPlayer.getDiscardPile().clear();
         currentPlayer.shuffleDeck();
-        
+
         int cardsToDraw = 5;
         if (currentPlayer.hasRelic("Bag of Preparation")) {
             cardsToDraw += 2;
@@ -295,29 +297,40 @@ public class GameWindow extends JFrame {
 
         CombatPanel combatPanel = new CombatPanel(this, currentPlayer, enemy);
         mainContainer.add(combatPanel, "COMBAT");
-        
+
         showScreen("COMBAT");
+    }
+
+
+    public void showWinScreen() {
+        WinScreen winScreen = new WinScreen(this, currentPlayer);
+        mainContainer.add(winScreen, "WIN_SCREEN");
+        showScreen("WIN_SCREEN");
+    }
+
+
+    public void showGameOverScreen() {
+        showScreen("GAME_OVER");
     }
 
     public void showMapDialog() {
         if (currentMap == null) return;
-        
+
         JDialog dialog = new JDialog(this, "World Map", false);
         MapPanel mapPanel = new MapPanel(this, currentMap, false);
         JScrollPane scrollPane = new JScrollPane(mapPanel);
         scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
         scrollPane.getVerticalScrollBar().setUnitIncrement(20);
-        
+
         dialog.add(scrollPane);
         dialog.setSize(1000, 800);
         dialog.setLocationRelativeTo(this);
         dialog.setVisible(true);
 
-
         SwingUtilities.invokeLater(() -> {
             JScrollBar vertical = scrollPane.getVerticalScrollBar();
             vertical.setValue(vertical.getMaximum());
-            
+
             JScrollBar horizontal = scrollPane.getHorizontalScrollBar();
             int max = horizontal.getMaximum();
             int extent = horizontal.getModel().getExtent();
@@ -327,18 +340,18 @@ public class GameWindow extends JFrame {
 
     public void showDeckDialog() {
         if (currentPlayer == null) return;
-        
+
         List<Card> fullDeck = new ArrayList<>();
         fullDeck.addAll(currentPlayer.getDeck());
         fullDeck.addAll(currentPlayer.getHand());
         fullDeck.addAll(currentPlayer.getDiscardPile());
-        
+
         JDialog dialog = new JDialog(this, "Current Deck (" + fullDeck.size() + " cards)", false);
         DeckPanel deckPanel = new DeckPanel(fullDeck);
         JScrollPane scrollPane = new JScrollPane(deckPanel);
         scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
         scrollPane.getVerticalScrollBar().setUnitIncrement(20);
-        
+
         dialog.add(scrollPane);
         dialog.setSize(800, 600);
         dialog.setLocationRelativeTo(this);
@@ -352,7 +365,7 @@ public class GameWindow extends JFrame {
                 upgradable.add(c);
             }
         }
-        
+
         JDialog dialog = new JDialog(this, "Select a card to Upgrade", true);
         DeckPanel deckPanel = new DeckPanel(upgradable, card -> {
             onUpgrade.accept(card);
@@ -361,7 +374,7 @@ public class GameWindow extends JFrame {
         JScrollPane scrollPane = new JScrollPane(deckPanel);
         scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
         scrollPane.getVerticalScrollBar().setUnitIncrement(20);
-        
+
         dialog.add(scrollPane);
         dialog.setSize(800, 600);
         dialog.setLocationRelativeTo(this);
@@ -369,7 +382,7 @@ public class GameWindow extends JFrame {
     }
 
     private void showLegendDialog() {
-        JDialog dialog = new JDialog(this, "Map Legend", false); // Non-modal
+        JDialog dialog = new JDialog(this, "Map Legend", false);
         dialog.add(new MapLegendPanel());
         dialog.pack();
         dialog.setLocationRelativeTo(this);
@@ -420,7 +433,7 @@ public class GameWindow extends JFrame {
         JScrollPane scrollPane = new JScrollPane(deckPanel);
         scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
         scrollPane.getVerticalScrollBar().setUnitIncrement(20);
-        
+
         dialog.add(scrollPane);
         dialog.setSize(800, 600);
         dialog.setLocationRelativeTo(this);
@@ -445,4 +458,3 @@ public class GameWindow extends JFrame {
         showScreen("EVENT");
     }
 }
-
