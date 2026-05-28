@@ -27,6 +27,8 @@ public class RewardPanel extends JPanel {
     private JButton claimBtn;
     private JButton skipBtn;
 
+    private Image treasureBgImage;
+
     private static final int CARD_WIDTH = 160;
     private static final int CARD_HEIGHT = 240;
 
@@ -40,6 +42,11 @@ public class RewardPanel extends JPanel {
         this.selectedCard = null;
         this.relicReward = null;
 
+        try {
+            treasureBgImage = new ImageIcon("Res/treasure chest backgroudn.jpg").getImage();
+        } catch (Exception e) {
+            System.err.println("Could not load treasure background: " + e.getMessage());
+        }
 
         if (!isTreasure) {
             goldReward = isElite ? 30 + new Random().nextInt(20) : 15 + new Random().nextInt(15);
@@ -52,7 +59,7 @@ public class RewardPanel extends JPanel {
                         validCards.add(c);
                     }
                 }
-                
+
                 java.util.Collections.shuffle(validCards);
                 for (int i = 0; i < Math.min(3, validCards.size()); i++) {
                     cardChoices.add(new Card(validCards.get(i)));
@@ -61,7 +68,7 @@ public class RewardPanel extends JPanel {
         }
 
         if (isElite || isTreasure) {
-            relicReward = Relic.getRandomRelic();
+            relicReward = Relic.getRandomRelic(player.getRelics());
         }
 
         setLayout(null);
@@ -87,13 +94,12 @@ public class RewardPanel extends JPanel {
     private void createButtons() {
         claimBtn = new JButton(isTreasure ? "CLAIM RELIC & CONTINUE" : "CLAIM REWARDS");
         claimBtn.setFont(new Font("Arial", Font.BOLD, 18));
-        claimBtn.setBackground(new Color(218, 165, 32)); // Goldenrod
+        claimBtn.setBackground(new Color(218, 165, 32));
         claimBtn.setForeground(Color.WHITE);
         claimBtn.setFocusPainted(false);
         claimBtn.setBorder(BorderFactory.createLineBorder(Color.ORANGE, 2));
         claimBtn.addActionListener(e -> claimRewards());
         add(claimBtn);
-
 
         if (!isTreasure) {
             skipBtn = new JButton("SKIP CARD & CONTINUE");
@@ -133,7 +139,7 @@ public class RewardPanel extends JPanel {
         for (int i = 0; i < cardChoices.size(); i++) {
             int cx = startX + i * (CARD_WIDTH + 30);
             if (mouseX >= cx && mouseX <= cx + CARD_WIDTH &&
-                mouseY >= cardY && mouseY <= cardY + CARD_HEIGHT) {
+                    mouseY >= cardY && mouseY <= cardY + CARD_HEIGHT) {
                 selectedCard = cardChoices.get(i);
                 repaint();
                 break;
@@ -178,18 +184,20 @@ public class RewardPanel extends JPanel {
         int w = getWidth();
         int h = getHeight();
 
-
-        GradientPaint gp = new GradientPaint(0, 0, new Color(20, 20, 35), 0, h, new Color(5, 5, 10));
-        g2.setPaint(gp);
-        g2.fillRect(0, 0, w, h);
-
+        if (isTreasure && treasureBgImage != null) {
+            g2.drawImage(treasureBgImage, 0, 0, w, h, null);
+        } else {
+            GradientPaint gp = new GradientPaint(0, 0, new Color(20, 20, 35), 0, h, new Color(5, 5, 10));
+            g2.setPaint(gp);
+            g2.fillRect(0, 0, w, h);
+        }
 
         g2.setColor(Color.WHITE);
         g2.setFont(new Font("Arial", Font.BOLD, 36));
         String titleStr = isTreasure ? "TREASURE CHEST!" : "VICTORY!";
         FontMetrics fmTitle = g2.getFontMetrics();
         g2.drawString(titleStr, (w - fmTitle.stringWidth(titleStr)) / 2, 70);
-        
+
         if (!isTreasure && goldReward > 0) {
             g2.setColor(Color.YELLOW);
             g2.setFont(new Font("Arial", Font.BOLD, 24));
@@ -198,27 +206,23 @@ public class RewardPanel extends JPanel {
             g2.drawString(goldStr, (w - fmGold.stringWidth(goldStr)) / 2, 110);
         }
 
-
         if (relicReward != null) {
             int ry = isTreasure ? h / 2 - 140 : 120;
-            
 
             g2.setColor(new Color(255, 215, 0, 40));
             g2.fillOval(w / 2 - 45, ry - 5, 90, 90);
-            
+
             g2.setColor(new Color(60, 45, 20));
             g2.fillOval(w / 2 - 40, ry, 80, 80);
             g2.setColor(Color.ORANGE);
             g2.setStroke(new BasicStroke(3));
             g2.drawOval(w / 2 - 40, ry, 80, 80);
 
-
             g2.setColor(Color.WHITE);
             g2.setFont(new Font("Arial", Font.BOLD, 36));
             String initial = relicReward.getName().substring(0, 1).toUpperCase();
             FontMetrics fmInit = g2.getFontMetrics();
             g2.drawString(initial, w / 2 - fmInit.stringWidth(initial) / 2, ry + 40 + fmInit.getAscent() / 2 - 5);
-
 
             g2.setFont(new Font("Arial", Font.BOLD, 22));
             g2.setColor(Color.ORANGE);
@@ -232,7 +236,6 @@ public class RewardPanel extends JPanel {
             FontMetrics fmRelicDesc = g2.getFontMetrics();
             g2.drawString(relicDesc, (w - fmRelicDesc.stringWidth(relicDesc)) / 2, ry + 140);
         }
-
 
         if (!isTreasure) {
             g2.setFont(new Font("Arial", Font.BOLD, 20));
@@ -255,10 +258,8 @@ public class RewardPanel extends JPanel {
     }
 
     private void drawChoiceCard(Graphics2D g2, Card card, int x, int y, boolean isSelected) {
-
         g2.setColor(new Color(30, 30, 45));
         g2.fillRoundRect(x, y, CARD_WIDTH, CARD_HEIGHT, 15, 15);
-        
 
         if (isSelected) {
             g2.setColor(Color.GREEN);
@@ -269,16 +270,13 @@ public class RewardPanel extends JPanel {
         }
         g2.drawRoundRect(x, y, CARD_WIDTH, CARD_HEIGHT, 15, 15);
 
-
         g2.setColor(Color.WHITE);
         g2.setFont(new Font("Arial", Font.BOLD, 15));
         FontMetrics fmTitle = g2.getFontMetrics();
         g2.drawString(card.getName(), x + (CARD_WIDTH - fmTitle.stringWidth(card.getName())) / 2, y + 35);
-        
 
         g2.setColor(new Color(80, 80, 100));
         g2.drawLine(x + 15, y + 50, x + CARD_WIDTH - 15, y + 50);
-
 
         g2.setColor(card.getType() == Card.CardType.ATTACK ? new Color(180, 50, 50) : new Color(50, 120, 180));
         g2.fillRoundRect(x + 20, y + 60, CARD_WIDTH - 40, 20, 4, 4);
@@ -288,7 +286,6 @@ public class RewardPanel extends JPanel {
         FontMetrics fmType = g2.getFontMetrics();
         g2.drawString(typeText, x + (CARD_WIDTH - fmType.stringWidth(typeText)) / 2, y + 74);
 
-
         g2.setColor(new Color(220, 220, 220));
         g2.setFont(new Font("Arial", Font.PLAIN, 12));
         String desc = card.getDescription();
@@ -297,7 +294,7 @@ public class RewardPanel extends JPanel {
             StringBuilder currentLine = new StringBuilder();
             int lineY = y + 115;
             int maxTextWidth = CARD_WIDTH - 24;
-            
+
             for (String word : words) {
                 String testLine = currentLine.length() == 0 ? word : currentLine + " " + word;
                 FontMetrics fm = g2.getFontMetrics();
@@ -313,7 +310,6 @@ public class RewardPanel extends JPanel {
                 g2.drawString(currentLine.toString(), x + 12, lineY);
             }
         }
-
 
         g2.setColor(new Color(230, 90, 40));
         g2.fillOval(x - 10, y - 10, 28, 28);

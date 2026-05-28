@@ -152,7 +152,7 @@ public class RandomEventPanel extends JPanel {
                 player.getHealth() > costHp,
                 () -> {
                     player.takeDamage(costHp);
-                    Relic relic = guaranteedRelic != null ? guaranteedRelic : Relic.getRandomRelic();
+                    Relic relic = guaranteedRelic != null ? guaranteedRelic : Relic.getRandomRelic(player.getRelics());
                     if (relic != null) player.addRelic(relic);
                 }
         ));
@@ -210,7 +210,7 @@ public class RandomEventPanel extends JPanel {
                 () -> {
                     player.takeDamage(loseHp);
                     for (int i = 0; i < relicCount; i++) {
-                        Relic r = Relic.getRandomRelic();
+                        Relic r = Relic.getRandomRelic(player.getRelics());
                         if (r != null) player.addRelic(r);
                     }
                 }
@@ -273,7 +273,7 @@ public class RandomEventPanel extends JPanel {
                 player.getGold() >= goldCost,
                 () -> {
                     player.removeGold(goldCost);
-                    Relic r = Relic.getRandomRelic();
+                    Relic r = Relic.getRandomRelic(player.getRelics());
                     if (r != null) player.addRelic(r);
                 }
         ));

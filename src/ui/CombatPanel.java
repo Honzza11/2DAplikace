@@ -16,10 +16,9 @@ public class CombatPanel extends JPanel {
     private Image enemyImage;
     private Image energyOrbImage;
     private GameWindow gameWindow;
-    
+
     private int mouseX = -1;
     private int mouseY = -1;
-    
 
     private static final int CARD_WIDTH = 120;
     private static final int CARD_HEIGHT = 170;
@@ -32,21 +31,29 @@ public class CombatPanel extends JPanel {
         this.player = player;
         this.enemy = enemy;
         this.hand = player.getHand();
-        
 
         try {
             backgroundImage = new ImageIcon("Res/pozadi dung.jpg").getImage();
-            
+
             if (player instanceof AshWalker) {
                 playerImage = new ImageIcon("Res/assasin.png").getImage();
             } else if (player instanceof Bard) {
                 playerImage = new ImageIcon("Res/bard111.png").getImage();
             }
-            
-            if (enemy != null && enemy.getName().toLowerCase().contains("slime")) {
-                enemyImage = new ImageIcon("Res/slime (1).png").getImage();
-            }
 
+
+            if (enemy != null) {
+                String imgPath = enemy.getImagePath();
+
+                if (imgPath == null || imgPath.isEmpty()) {
+                    if (enemy.getName().toLowerCase().contains("slime")) {
+                        imgPath = "Res/slime (1).png";
+                    } else {
+                        imgPath = "Res/slime (1).png";
+                    }
+                }
+                enemyImage = new ImageIcon(imgPath).getImage();
+            }
 
             energyOrbImage = new ImageIcon("Res/pngtree-red-energy-orb-png-image_19759672 (1).png").getImage();
         } catch (Exception e) {
@@ -54,10 +61,9 @@ public class CombatPanel extends JPanel {
         }
 
         setLayout(null);
-        setBackground(new Color(30, 30, 30)); 
-        
+        setBackground(new Color(30, 30, 30));
+
         createButtons();
-        
 
         addMouseListener(new java.awt.event.MouseAdapter() {
             @Override
@@ -74,7 +80,6 @@ public class CombatPanel extends JPanel {
                 repaint();
             }
         });
-
 
         addComponentListener(new java.awt.event.ComponentAdapter() {
             public void componentResized(java.awt.event.ComponentEvent e) {
@@ -95,18 +100,16 @@ public class CombatPanel extends JPanel {
         int startX = (w - totalHandWidth) / 2;
         int handY = uiStartY + (uiHeight - CARD_HEIGHT) / 2;
 
-
         for (int i = 0; i < handSize; i++) {
             int cardX = startX + i * (CARD_WIDTH + 15);
             if (mouseX >= cardX && mouseX <= cardX + CARD_WIDTH &&
-                mouseY >= handY && mouseY <= handY + CARD_HEIGHT) {
-                
+                    mouseY >= handY && mouseY <= handY + CARD_HEIGHT) {
+
                 Card card = hand.get(i);
 
                 if (player.playCard(card, enemy)) {
                     System.out.println("Played: " + card.getName());
                     repaint();
-                    
 
                     if (enemy.isDead()) {
                         System.out.println("Enemy defeated!");
@@ -117,11 +120,10 @@ public class CombatPanel extends JPanel {
                         player.getDiscardPile().clear();
                         player.resetBlock();
                         player.clearStatuses();
-                        
+
                         boolean isElite = enemy.getName().toLowerCase().contains("elite");
                         gameWindow.showCombatReward(isElite);
                     }
-
                 }
                 break;
             }
@@ -145,25 +147,22 @@ public class CombatPanel extends JPanel {
         endTurnBtn.setForeground(Color.WHITE);
         endTurnBtn.setFocusPainted(false);
         endTurnBtn.addActionListener(e -> {
-
             player.discardHand();
-
 
             if (player instanceof AshWalker) {
                 ((AshWalker) player).endTurn();
             }
-            
+
             if (enemy != null && !enemy.isDead()) {
                 enemy.takeTurn(player);
             }
 
             player.startTurn();
 
-
             if (player instanceof Bard && enemy != null) {
                 ((Bard) player).playEchoCards(enemy);
             }
-            
+
             repaint();
         });
         add(endTurnBtn);
@@ -173,7 +172,6 @@ public class CombatPanel extends JPanel {
         int w = getWidth();
         int h = getHeight();
         if (w <= 0 || h <= 0) return;
-        int battleHeight = (int)(h * 0.7);
 
         viewMapBtn.setBounds(w - 180, 20, 150, 40);
         viewDeckBtn.setBounds(w - 340, 20, 150, 40);
@@ -186,7 +184,7 @@ public class CombatPanel extends JPanel {
         super.paintComponent(g);
         Graphics2D g2 = (Graphics2D) g;
         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-        
+
         drawBackground(g2);
         drawEntities(g2);
         drawHand(g2);
@@ -197,14 +195,11 @@ public class CombatPanel extends JPanel {
     private void drawBackground(Graphics2D g2) {
         int w = getWidth();
         int h = getHeight();
-        int uiHeight = (int)(h * 0.3); 
+        int uiHeight = (int)(h * 0.3);
         int battleHeight = h - uiHeight;
-        
 
         if (backgroundImage != null) {
-
             g2.drawImage(backgroundImage, 0, 0, w, battleHeight, null);
-
             g2.setColor(new Color(0, 0, 0, 40));
             g2.fillRect(0, 0, w, battleHeight);
         } else {
@@ -212,11 +207,9 @@ public class CombatPanel extends JPanel {
             g2.setPaint(gp);
             g2.fillRect(0, 0, w, battleHeight);
         }
-        
 
         g2.setColor(Color.BLACK);
         g2.fillRect(0, battleHeight, w, uiHeight);
-        
 
         g2.setColor(new Color(80, 80, 80));
         g2.setStroke(new BasicStroke(3));
@@ -227,10 +220,8 @@ public class CombatPanel extends JPanel {
         int w = getWidth();
         int h = getHeight();
         int battleHeight = (int)(h * 0.7);
-        
 
         drawEntity(g2, player, (int)(w * 0.3) - 100, battleHeight - 370, Color.CYAN);
-        
 
         if (enemy != null) {
             drawEntity(g2, enemy, (int)(w * 0.7) - 100, battleHeight - 370, Color.RED);
@@ -258,7 +249,7 @@ public class CombatPanel extends JPanel {
         FontMetrics fmEntity = g2.getFontMetrics();
         int nameX = x + (200 - fmEntity.stringWidth(name)) / 2;
         int nameY = y - 60;
-        
+
         g2.setColor(Color.WHITE);
         g2.drawString(name, nameX - 1, nameY - 1);
         g2.drawString(name, nameX + 1, nameY - 1);
@@ -268,10 +259,9 @@ public class CombatPanel extends JPanel {
         g2.drawString(name, nameX + 1, nameY);
         g2.drawString(name, nameX, nameY - 1);
         g2.drawString(name, nameX, nameY + 1);
-        
+
         g2.setColor(Color.BLACK);
         g2.drawString(name, nameX, nameY);
-
 
         if (entity instanceof Enemy) {
             Enemy e = (Enemy) entity;
@@ -282,18 +272,18 @@ public class CombatPanel extends JPanel {
             int intentX = x + (200 - fmIntent.stringWidth(intentStr)) / 2;
             g2.drawString(intentStr, intentX, y - 90);
         }
-        
+
         int barWidth = 200;
         int barHeight = 20;
         int healthWidth = (int) ((double) hp / Math.max(1, maxHp) * barWidth);
-        
+
         g2.setColor(Color.GRAY);
         g2.fillRect(x, y - 40, barWidth, barHeight);
         g2.setColor(Color.GREEN);
         g2.fillRect(x, y - 40, healthWidth, barHeight);
         g2.setColor(Color.BLACK);
         g2.drawRect(x, y - 40, barWidth, barHeight);
-        
+
         g2.setColor(Color.BLACK);
         g2.setFont(new Font("Arial", Font.BOLD, 14));
         String hpStr = hp + " / " + maxHp;
@@ -301,21 +291,20 @@ public class CombatPanel extends JPanel {
         int hpX = x + (barWidth - fmHp.stringWidth(hpStr)) / 2;
         g2.drawString(hpStr, hpX, y - 25);
 
-
         if (block > 0) {
             g2.setColor(new Color(50, 150, 250));
             g2.fillRoundRect(x - 33, y - 44, 28, 28, 6, 6);
             g2.setColor(Color.WHITE);
             g2.drawRoundRect(x - 33, y - 44, 28, 28, 6, 6);
             g2.setFont(new Font("Arial", Font.BOLD, 13));
-            
+
             String blockStr = String.valueOf(block);
             FontMetrics fm = g2.getFontMetrics();
             int textX = (x - 33) + (28 - fm.stringWidth(blockStr)) / 2;
             int textY = (y - 44) + ((28 - fm.getHeight()) / 2) + fm.getAscent();
             g2.drawString(blockStr, textX, textY);
         }
-        
+
         int statusY = y - 75;
         int statusX = x;
         if (entity.getVulnerableTurns() > 0) {
@@ -335,39 +324,34 @@ public class CombatPanel extends JPanel {
         }
     }
 
-
     private void drawHand(Graphics2D g2) {
         int w = getWidth();
         int h = getHeight();
         int uiStartY = (int)(h * 0.7);
         int uiHeight = (int)(h * 0.3);
-        
+
         int totalHandWidth = hand.size() * (CARD_WIDTH + 15);
         int startX = (w - totalHandWidth) / 2;
         int handY = uiStartY + (uiHeight - CARD_HEIGHT) / 2;
-        
+
         for (int i = 0; i < hand.size(); i++) {
             drawCard(g2, hand.get(i), startX + i * (CARD_WIDTH + 15), handY);
         }
     }
 
     private void drawCard(Graphics2D g2, Card card, int x, int y) {
-
         g2.setColor(new Color(30, 30, 45));
         g2.fillRoundRect(x, y, CARD_WIDTH, CARD_HEIGHT, 12, 12);
         g2.setColor(new Color(255, 170, 0, 200));
         g2.setStroke(new BasicStroke(1.5f));
         g2.drawRoundRect(x, y, CARD_WIDTH, CARD_HEIGHT, 12, 12);
-        
 
         g2.setColor(Color.WHITE);
         g2.setFont(new Font("Arial", Font.BOLD, 12));
         g2.drawString(card.getName(), x + 20, y + 25);
-        
 
         g2.setColor(new Color(80, 80, 100));
         g2.drawLine(x + 10, y + 35, x + CARD_WIDTH - 10, y + 35);
-
 
         g2.setColor(card.getType() == Card.CardType.ATTACK ? new Color(180, 50, 50) : new Color(50, 120, 180));
         g2.fillRoundRect(x + 15, y + 42, CARD_WIDTH - 30, 16, 4, 4);
@@ -377,7 +361,6 @@ public class CombatPanel extends JPanel {
         FontMetrics fmType = g2.getFontMetrics();
         g2.drawString(typeText, x + (CARD_WIDTH - fmType.stringWidth(typeText)) / 2, y + 54);
 
-
         g2.setColor(new Color(220, 220, 220));
         g2.setFont(new Font("Arial", Font.PLAIN, 11));
         String desc = card.getDescription();
@@ -386,7 +369,7 @@ public class CombatPanel extends JPanel {
             StringBuilder currentLine = new StringBuilder();
             int lineY = y + 80;
             int maxTextWidth = CARD_WIDTH - 20;
-            
+
             for (String word : words) {
                 String testLine = currentLine.length() == 0 ? word : currentLine + " " + word;
                 FontMetrics fm = g2.getFontMetrics();
@@ -403,7 +386,6 @@ public class CombatPanel extends JPanel {
             }
         }
 
-
         g2.setColor(new Color(230, 90, 40));
         g2.fillOval(x - 8, y - 8, 22, 22);
         g2.setColor(Color.WHITE);
@@ -415,14 +397,11 @@ public class CombatPanel extends JPanel {
         g2.drawString(costStr, x - 8 + (22 - fmCost.stringWidth(costStr)) / 2, y - 8 + ((22 - fmCost.getHeight()) / 2) + fmCost.getAscent());
     }
 
-
     private void drawUIOverlay(Graphics2D g2) {
         int w = getWidth();
         int h = getHeight();
         int uiStartY = (int)(h * 0.7);
         int uiHeight = (int)(h * 0.3);
-        
-
 
         int orbX = 50;
         int orbY = uiStartY + (uiHeight - 100) / 2;
@@ -433,58 +412,49 @@ public class CombatPanel extends JPanel {
             g2.fillOval(orbX, orbY, 100, 100);
         }
 
-
         String energyText = player.getEnergy() + "/" + player.getMaxEnergy();
         g2.setFont(new Font("Arial", Font.BOLD, 30));
         FontMetrics fmEnergy = g2.getFontMetrics();
         int textX = orbX + (100 - fmEnergy.stringWidth(energyText)) / 2;
         int textY = orbY + ((100 - fmEnergy.getHeight()) / 2) + fmEnergy.getAscent();
 
-
         g2.setColor(Color.BLACK);
         g2.drawString(energyText, textX + 2, textY + 2);
-        
 
         g2.setColor(Color.WHITE);
         g2.drawString(energyText, textX, textY);
-
 
         g2.setColor(Color.WHITE);
         g2.setFont(new Font("Arial", Font.BOLD, 18));
         g2.drawString("Draw: " + player.getDeck().size(), 50, uiStartY + 30);
         g2.drawString("Discard: " + player.getDiscardPile().size(), 50, h - 30);
 
-
         int rx = 20;
         int ry = 20;
         for (Relic relic : player.getRelics()) {
-
             g2.setColor(new Color(0, 0, 0, 150));
             g2.fillOval(rx + 2, ry + 2, 36, 36);
-
 
             g2.setColor(new Color(60, 45, 20));
             g2.fillOval(rx, ry, 36, 36);
             g2.setColor(Color.ORANGE);
             g2.setStroke(new BasicStroke(2));
             g2.drawOval(rx, ry, 36, 36);
-            
 
             g2.setColor(Color.WHITE);
             g2.setFont(new Font("Arial", Font.BOLD, 18));
             String initial = relic.getName().substring(0, 1).toUpperCase();
             FontMetrics fm = g2.getFontMetrics();
             g2.drawString(initial, rx + (36 - fm.stringWidth(initial)) / 2, ry + ((36 - fm.getHeight()) / 2) + fm.getAscent());
-            
+
             rx += 46;
         }
-
 
         if (player instanceof AshWalker) {
             AshWalker ash = (AshWalker) player;
             int heat = ash.getHeat();
             int bonusDmg = ash.getDamageBonus();
-            
+
             g2.setFont(new Font("Arial", Font.BOLD, 18));
             if (heat <= 10) {
                 g2.setColor(Color.ORANGE);
@@ -524,20 +494,18 @@ public class CombatPanel extends JPanel {
                 g2.setColor(Color.WHITE);
                 g2.drawOval(cx, cy, circle, circle);
             }
-            
-            // Active Rhythm Tracker
+
             g2.setFont(new Font("Arial", Font.PLAIN, 14));
             g2.setColor(new Color(220, 220, 220));
             g2.drawString("Last Note: " + (tones.isEmpty() ? "None" : tones.get(tones.size() - 1)), 20, 135);
-            
-            // Combo Cheat Sheet
+
             int comboX = w - 280;
             int comboY = 80;
             g2.setColor(new Color(0, 0, 0, 150));
             g2.fillRoundRect(comboX, comboY, 260, 100, 10, 10);
             g2.setColor(new Color(150, 150, 150));
             g2.drawRoundRect(comboX, comboY, 260, 100, 10, 10);
-            
+
             g2.setColor(Color.WHITE);
             g2.setFont(new Font("Arial", Font.BOLD, 14));
             g2.drawString("Combo Cheat Sheet", comboX + 10, comboY + 20);
@@ -549,7 +517,6 @@ public class CombatPanel extends JPanel {
             g2.setColor(new Color(100, 255, 150));
             g2.drawString("Mixed / 🟢🟢🟢: Resonant Echo (+1 EN, 1 Card)", comboX + 10, comboY + 85);
         }
-
     }
 
     private void drawTooltips(Graphics2D g2) {
@@ -557,7 +524,6 @@ public class CombatPanel extends JPanel {
 
         int panelW = getWidth();
         int panelH = getHeight();
-
         int rx = 20;
         int ry = 20;
 
@@ -612,13 +578,11 @@ public class CombatPanel extends JPanel {
         g2.setColor(new Color(255, 180, 50, 160));
         g2.drawRoundRect(tooltipX, tooltipY, tooltipW, tooltipH, corner, corner);
 
-
         int textX = tooltipX + padding;
         int y = tooltipY + padding + fmTitle.getAscent();
         g2.setColor(Color.WHITE);
         g2.setFont(titleFont);
         g2.drawString(title, textX, y);
-
 
         y += 6 + fmDesc.getAscent();
         g2.setFont(descFont);

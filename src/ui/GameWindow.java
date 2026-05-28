@@ -18,6 +18,7 @@ public class GameWindow extends JFrame {
     private JLabel mapHpLabel;
 
     public GameWindow() {
+        EnemyLoader.loadEnemies("Res/enemies.json");
         setTitle("Kill the Pyre");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setExtendedState(JFrame.MAXIMIZED_BOTH); // Start maximized

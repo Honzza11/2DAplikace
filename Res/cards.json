@@ -39,24 +39,25 @@
     "name": "Soul Melody",
     "cost": 1,
     "type": "SKILL",
-    "description": "Gain 4 Block. Adds a Skill note.",
-    "block": 4,
+    "description": "Gain 5 Block. Rhythm: if the previous card was a different type, draw 1 card.",
+    "block": 5,
+    "rhythm_draw": 1,
     "heroClass": "Bard",
     "upgrade_block": 3,
-    "upgrade_description": "Gain 7 Block. Adds a Skill note."
+    "upgrade_description": "Gain 8 Block. Rhythm: if the previous card was a different type, draw 1 card."
   },
   {
     "id": "dangerous_note",
     "name": "Dangerous Note",
-    "cost": 2,
+    "cost": 1,
     "type": "ATTACK",
-    "description": "Deal 5 damage. Adds an Attack note.",
-    "damage": 5,
+    "description": "Deal 6 damage. Rhythm: if the previous card was a different type, apply 1 Vulnerable.",
+    "damage": 6,
+    "rhythm_apply_vulnerable": 1,
     "heroClass": "Bard",
-    "upgrade_cost": 1,
-    "upgrade_description": "Deal 5 damage. Adds an Attack note."
-  }
-  ,
+    "upgrade_damage": 3,
+    "upgrade_description": "Deal 9 damage. Rhythm: if the previous card was a different type, apply 1 Vulnerable."
+  },
   {
     "id": "obsidian_dagger",
     "name": "Obsidian Dagger",
@@ -83,7 +84,6 @@
     "upgrade_heat_gain": 2,
     "upgrade_description": "Deal 15 damage. Gain 4 Heat."
   },
-
   {
     "id": "quench_coils",
     "name": "Quench & Coils",
@@ -277,22 +277,24 @@
     "name": "Quick Prelude",
     "cost": 0,
     "type": "SKILL",
-    "description": "Gain 3 Block. Adds a Skill note.",
+    "description": "Gain 3 Block. Rhythm: if the previous card was a different type, gain 1 Energy.",
     "block": 3,
+    "rhythm_energy_gain": 1,
     "heroClass": "Bard",
     "upgrade_block": 2,
-    "upgrade_description": "Gain 5 Block. Adds a Skill note."
+    "upgrade_description": "Gain 5 Block. Rhythm: if the previous card was a different type, gain 1 Energy."
   },
   {
     "id": "double_staccato",
     "name": "Double Staccato",
     "cost": 2,
     "type": "ATTACK",
-    "description": "Deal 4 damage 2 times. Adds 2 Attack notes.",
+    "description": "Deal 4 damage 2 times. Rhythm: if the previous card was a different type, attack 3 times instead.",
     "damage": 4,
     "multi_attack": 2,
+    "rhythm_multi_attack": 3,
     "heroClass": "Bard",
     "upgrade_damage": 2,
-    "upgrade_description": "Deal 6 damage 2 times. Adds 2 Attack notes."
+    "upgrade_description": "Deal 6 damage 2 times. Rhythm: if the previous card was a different type, attack 3 times instead."
   }
 ]

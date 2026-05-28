@@ -1,0 +1,41 @@
+[
+  {
+    "id": "slime",
+    "name": "Slime",
+    "pool": "NORMAL",
+    "minHp": 45,
+    "maxHp": 55,
+    "imagePath": "Res/slime (1).png",
+    "moves": [
+      { "type": "ATTACK", "chanceWeight": 60, "minVal": 6, "maxVal": 10 },
+      { "type": "BLOCK", "chanceWeight": 25, "minVal": 5, "maxVal": 10 },
+      { "type": "VULNERABLE", "chanceWeight": 15, "minVal": 1, "maxVal": 2 }
+    ]
+  },
+  {
+    "id": "elite_slime",
+    "name": "Elite Slime",
+    "pool": "ELITE",
+    "minHp": 80,
+    "maxHp": 95,
+    "imagePath": "Res/elite_slime.png",
+    "moves": [
+      { "type": "ATTACK", "chanceWeight": 50, "minVal": 12, "maxVal": 18 },
+      { "type": "BLOCK", "chanceWeight": 25, "minVal": 10, "maxVal": 15 },
+      { "type": "WEAK", "chanceWeight": 25, "minVal": 2, "maxVal": 3 }
+    ]
+  },
+  {
+    "id": "the_pyre_avatar",
+    "name": "Avatar of Pyre",
+    "pool": "BOSS",
+    "minHp": 200,
+    "maxHp": 220,
+    "imagePath": "Res/pyre_avatar.png",
+    "moves": [
+      { "type": "ATTACK", "chanceWeight": 60, "minVal": 20, "maxVal": 26 },
+      { "type": "BLOCK", "chanceWeight": 20, "minVal": 15, "maxVal": 25 },
+      { "type": "VULNERABLE", "chanceWeight": 20, "minVal": 2, "maxVal": 3 }
+    ]
+  }
+]
