@@ -11,15 +11,23 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+/**
+ * Panel určený pro zobrazení textových náhodných událostí (Random Events) na mapě.
+ * Hráč je postaven před příběhovou situaci s několika volbami, které mohou ovlivnit
+ * jeho zdraví, zlato, balíček nebo relikvie. Volby se dynamicky zamykají podle zdrojů hráče.
+ */
 public class RandomEventPanel extends JPanel {
     private final GameWindow gameWindow;
     private final Player player;
-    private Image backgroundImage;
+    private Image backgroundImage; // Drží obrázek specifický pro konkrétní událost
 
+    /**
+     * Vnitřní pomocná třída reprezentující jednu konkrétní volbu v události.
+     */
     private static class Choice {
-        final String label;
-        final boolean enabled;
-        final Runnable action;
+        final String label;    // Text na tlačítku volby
+        final boolean enabled; // Určuje, zda si hráč může volbu dovolit (např. dostatek zlata/HP)
+        final Runnable action; // Logický blok (funkce), který se spustí při kliknutí
 
         Choice(String label, boolean enabled, Runnable action) {
             this.label = label;
@@ -35,6 +43,7 @@ public class RandomEventPanel extends JPanel {
         setLayout(new BorderLayout());
         setBackground(new Color(20, 20, 30));
 
+        // --- HORNÍ LIŠTA (Název události a aktuální statistiky hráče) ---
         JPanel topPanel = new JPanel(new BorderLayout());
         topPanel.setOpaque(false);
         topPanel.setBorder(BorderFactory.createEmptyBorder(20, 40, 10, 40));
@@ -51,6 +60,7 @@ public class RandomEventPanel extends JPanel {
 
         add(topPanel, BorderLayout.NORTH);
 
+        // --- STŘEDOVÝ PANEL (Atmosférické texty a popis situace) ---
         JPanel centerPanel = new JPanel();
         centerPanel.setOpaque(false);
         centerPanel.setLayout(new BoxLayout(centerPanel, BoxLayout.Y_AXIS));
@@ -78,6 +88,7 @@ public class RandomEventPanel extends JPanel {
 
         add(centerPanel, BorderLayout.CENTER);
 
+        // --- SPODNÍ PANEL (Interaktivní tlačítka voleb) ---
         JPanel bottomPanel = new JPanel();
         bottomPanel.setOpaque(false);
         bottomPanel.setBorder(BorderFactory.createEmptyBorder(10, 40, 30, 40));
@@ -85,10 +96,12 @@ public class RandomEventPanel extends JPanel {
 
         add(bottomPanel, BorderLayout.SOUTH);
 
+        // --- SELEKCE A VYBUDOVÁNÍ NÁHODNÉ UDÁLOSTI ---
         Random random = new Random();
-        int eventId = random.nextInt(5);
+        int eventId = random.nextInt(5); // Náhodný výběr z 5 možných událostí
         EventData event = buildEvent(eventId);
 
+        // Pokus o načtení tematického obrázku na pozadí
         if (event.imagePath != null && !event.imagePath.isEmpty()) {
             try {
                 backgroundImage = new ImageIcon(event.imagePath).getImage();
@@ -98,22 +111,24 @@ public class RandomEventPanel extends JPanel {
             }
         }
 
+        // Naplnění textových komponent vybranými daty
         titleLabel.setText(event.title);
         subtitleLabel.setText(event.subtitle);
         eventText.setText(event.text);
 
+        // Dynamické generování tlačítek pro jednotlivé dostupné/nedostupné volby
         for (Choice choice : event.choices) {
             JButton btn = new JButton(choice.label);
             btn.setFont(new Font("Arial", Font.BOLD, 22));
             btn.setFocusPainted(false);
-            btn.setEnabled(choice.enabled);
+            btn.setEnabled(choice.enabled); // Tlačítko se deaktivuje, pokud nesplňuje podmínku
             btn.setBackground(choice.enabled ? new Color(218, 165, 32) : new Color(90, 90, 90));
             btn.setForeground(Color.WHITE);
             btn.setBorder(BorderFactory.createLineBorder(Color.ORANGE, 2));
 
             btn.addActionListener(e -> {
-                choice.action.run();
-                gameWindow.showScreen("MAP");
+                choice.action.run(); // Spustí logiku navázanou na konkrétní tlačítko
+                gameWindow.showScreen("MAP"); // Po vyřešení události vrátí hráče na mapu
             });
 
             bottomPanel.add(btn);
@@ -121,6 +136,9 @@ public class RandomEventPanel extends JPanel {
         }
     }
 
+    /**
+     * Vnitřní datová struktura sdružující kompletní textová a vizuální data jedné události.
+     */
     private static class EventData {
         final String title;
         final String subtitle;
@@ -137,6 +155,9 @@ public class RandomEventPanel extends JPanel {
         }
     }
 
+    /**
+     * Tovární rozcestník, který na základě ID vybuduje příslušný datový balíček události.
+     */
     private EventData buildEvent(int eventId) {
         switch (eventId) {
             case 0:
@@ -152,6 +173,13 @@ public class RandomEventPanel extends JPanel {
         }
     }
 
+    // =========================================================================
+    // SPECIFICKÉ DEFINICE JEDNOTLIVÝCH UDÁLOSTÍ
+    // =========================================================================
+
+    /**
+     * Událost: Temný oltář. Nabízí relikvii výměnou za životy, nebo bezpečné vyléčení.
+     */
     private EventData darkAltarEvent() {
         int costHp = 15;
         List<Choice> choices = new ArrayList<>();
@@ -181,6 +209,9 @@ public class RandomEventPanel extends JPanel {
         );
     }
 
+    /**
+     * Událost: Ztracená skrýš. Umožní vybrat si mezi zlaťáky nebo náhodnou kartou pro danou třídu.
+     */
     private EventData lostCacheEvent() {
         int goldGain = 25 + new Random().nextInt(21);
         List<Choice> choices = new ArrayList<>();
@@ -209,6 +240,9 @@ public class RandomEventPanel extends JPanel {
         );
     }
 
+    /**
+     * Událost: Prokletá svatyně. Riskantní zisk relikvie za cenu poškození, nebo možnost beztrestně utéct.
+     */
     private EventData cursedShrineEvent() {
         int loseHp = 8;
         int relicCount = 1;
@@ -241,6 +275,9 @@ public class RandomEventPanel extends JPanel {
         );
     }
 
+    /**
+     * Událost: Kovářova nabídka. Umožní za poplatek vylepšit kartu otevřením Smith dialogu, nebo se vyléčit.
+     */
     private EventData anvilDealEvent() {
         int upgradeCostGold = 60;
         List<Choice> choices = new ArrayList<>();
@@ -271,6 +308,9 @@ public class RandomEventPanel extends JPanel {
         );
     }
 
+    /**
+     * Událost: Podivný kupec. Nabízí nákup relikvie, směnu zlata za zdraví, nebo standardní profit zlata.
+     */
     private EventData merchantDealEvent() {
         int goldCost = 35;
         int goldGain = 25 + new Random().nextInt(16);
@@ -278,6 +318,7 @@ public class RandomEventPanel extends JPanel {
 
         List<Choice> choices = new ArrayList<>();
 
+        // ZDE BYL OPRAVEN OMYLEM ZMĚNĚNÝ ŘÁDEK ZPĚT NA ORIGINÁL
         choices.add(new Choice(
                 "Pay " + goldCost + "  and gain a relic",
                 player.getGold() >= goldCost,
@@ -320,6 +361,10 @@ public class RandomEventPanel extends JPanel {
         );
     }
 
+    /**
+     * Pomocná metoda, která vybere náhodnou kartu filtrovanou buď jako "Neutral"
+     * nebo specifickou pro aktuální třídu hrdiny (např. AshWalker nebo Bard).
+     */
     private Card pickRandomCardForPlayer() {
         List<Card> allCards = CardLoader.loadCards("Res/cards.json");
         if (allCards == null || allCards.isEmpty()) return null;

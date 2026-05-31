@@ -1,5 +1,10 @@
 package model;
 
+/**
+ * Třída řídící průběh a logiku souboje mezi hráčem a nepřítelem.
+ * Střídá tahy, spouští efekty relikvií na začátku souboje a předává
+ * řízení specifickým mechanikám jednotlivých hrdinů (např. přehřívání AshWalkera).
+ */
 public class CombatManager {
     private Player player;
     private Enemy enemy;
@@ -13,12 +18,17 @@ public class CombatManager {
         this.isPlayerTurn = true;
     }
 
+    /**
+     * Inicializuje souboj. Resetuje statusy hráče a spouští efekty relikvií,
+     * které se mají aktivovat hned na začátku střetnutí (Anchor, Lantern, Bag of Preparation).
+     */
     public void startCombat() {
         System.out.println("\n=== COMBAT STARTED vs " + enemy.getName() + " ===");
         player.setAttackedThisCombat(false);
         player.clearStatuses();
         player.startTurn();
 
+        // Kontrola a vyhodnocení relikvií na začátku souboje
         for (Relic r : player.getRelics()) {
             if (r.getName().equalsIgnoreCase("Anchor")) {
                 player.addBlock(10);
@@ -32,10 +42,16 @@ public class CombatManager {
         }
     }
 
+    /**
+     * Ukončí tah hráče. Zahodí zbývající karty z ruky do odhazovacího balíčku,
+     * spustí specifickou end-turn logiku (např. kontrolu přehřátí u AshWalkera)
+     * a předá řízení nepříteli.
+     */
     public void endPlayerTurn() {
         System.out.println("\n--- Player ends turn ---");
         player.discardHand();
 
+        // Kontrola specifické třídy hráče pro ukončení tahu
         if (player instanceof AshWalker) {
             ((AshWalker) player).endTurn();
         }
@@ -44,6 +60,11 @@ public class CombatManager {
         handleEnemyTurn();
     }
 
+    /**
+     * Provede tah nepřítele, pokud je naživu. Resetuje nepříteli štíty (Block),
+     * provede jeho akce vůči hráči a následně inkrementuje počítadlo kol
+     * a připraví nový tah pro hráče (doplnění energie, líznutí karet).
+     */
     private void handleEnemyTurn() {
         if (enemy.isDead()) return;
 
@@ -51,9 +72,10 @@ public class CombatManager {
         enemy.resetBlock();
         enemy.takeTurn(player);
 
+        // Přechod zpět na tah hráče
         turnCount++;
         isPlayerTurn = true;
-        player.startTurn(); 
+        player.startTurn();
         System.out.println("\n=== Turn " + turnCount + " (Player) ===");
     }
 

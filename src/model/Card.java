@@ -3,6 +3,11 @@ package model;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Třída reprezentující herní kartu.
+ * Karta uchovává své základní vlastnosti (název, cenu, typ) a mapu efektů,
+ * které se vyhodnocují při jejím zahrání. Podporuje také mechaniku vylepšování (upgrade).
+ */
 public class Card {
     public enum CardType {
         ATTACK, SKILL, POWER
@@ -68,6 +73,10 @@ public class Card {
         return effects.get(key);
     }
 
+    /**
+     * Hlavní metoda pro zahrání karty. Zjišťuje, zda karta nemá efekt vícenásobného
+     * útoku ("multi_attack"), a podle toho ji jednou či vícekrát vyhodnotí.
+     */
     public void play(Entity user, Entity target) {
         int plays = effects.getOrDefault("multi_attack", 1);
         for (int i = 0; i < plays; i++) {
@@ -75,8 +84,14 @@ public class Card {
         }
     }
 
+    /**
+     * Interní metoda pro vyhodnocení jednoho instančního efektu karty.
+     * Zpracovává podmínky, modifikátory poškození, pasivní bonusy postav a aplikaci statusů.
+     */
     private void resolveSinglePlay(Entity user, Entity target) {
         boolean conditionMet = true;
+
+        // Kontrola podmínek na úroveň tepla u AshWalkera
         if (effects.containsKey("condition_heat_max") && user instanceof AshWalker) {
             if (((AshWalker) user).getHeat() >= effects.get("condition_heat_max")) conditionMet = false;
         }
@@ -87,10 +102,12 @@ public class Card {
             if (((AshWalker) user).getHeat() != effects.get("condition_heat")) conditionMet = false;
         }
 
+        // Léčení postavy
         if (effects.containsKey("heal") && conditionMet) {
             user.heal(effects.get("heal"));
         }
 
+        // Konverze tepla na štíty u AshWalkera
         if (effects.containsKey("consume_heat_for_block") && user instanceof AshWalker) {
             AshWalker ash = (AshWalker) user;
             int heat = ash.getHeat();
@@ -100,7 +117,7 @@ public class Card {
             }
         }
 
-
+        // Výpočet a aplikace poškození (včetně bonusů tříd, relikvií a postihů za oslabení)
         if (effects.containsKey("damage")) {
             int finalDamage = effects.get("damage");
 
@@ -129,7 +146,6 @@ public class Card {
                 }
             }
 
-
             if (user.getWeakTurns() > 0) {
                 finalDamage = (int)(finalDamage * 0.75);
             }
@@ -139,7 +155,7 @@ public class Card {
             }
         }
 
-
+        // Aplikace negativních statusů cíli
         if (target != null && conditionMet) {
             if (effects.containsKey("apply_vulnerable")) {
                 int amount = effects.get("apply_vulnerable");
@@ -161,6 +177,7 @@ public class Card {
             }
         }
 
+        // Přidání bloku (obrany) uživateli karty
         if (effects.containsKey("block") && conditionMet) {
             int blockAmount = effects.get("block");
             if (user instanceof Bard) {
@@ -172,6 +189,7 @@ public class Card {
             user.addBlock(blockAmount);
         }
 
+        // Změny stavu tepla pro AshWalkera
         if (effects.containsKey("heat_gain") && user instanceof AshWalker) {
             ((AshWalker) user).addHeat(effects.get("heat_gain"));
         }
@@ -180,11 +198,13 @@ public class Card {
             ((AshWalker) user).reduceHeat(effects.get("heat_loss"));
         }
 
+        // Přidání energie hráči
         if (effects.containsKey("energy_gain") && user instanceof Player && conditionMet) {
             Player p = (Player) user;
             p.setEnergy(p.getEnergy() + effects.get("energy_gain"));
         }
 
+        // Lízání nových karet z balíčku
         if (effects.containsKey("draw") && user instanceof Player && conditionMet) {
             Player p = (Player) user;
             p.drawCards(effects.get("draw"));
@@ -199,6 +219,9 @@ public class Card {
     public String getHeroClass() { return heroClass; }
     public boolean isUpgraded() { return isUpgraded; }
 
+    /**
+     * Provede permanentní vylepšení karty podle zadaných parametrů v upgradeEffects.
+     */
     public void upgrade() {
         if (!isUpgraded) {
             isUpgraded = true;

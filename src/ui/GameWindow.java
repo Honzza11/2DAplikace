@@ -6,6 +6,12 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Hlavní okno hry typu JFrame, které slouží jako hlavní řadič (Controller) celé aplikace.
+ * Spravuje životní cyklus hry, drží instanci aktuálního hráče a mapy světa.
+ * Využívá CardLayout pro plynulé přepínání mezi hlavními herními obrazovkami
+ * (Menu, Výběr postavy, Mapa, Souboj, Obchod, Odpočinek atd.).
+ */
 public class GameWindow extends JFrame {
     private CardLayout cardLayout;
     private JPanel mainContainer;
@@ -18,16 +24,18 @@ public class GameWindow extends JFrame {
     private JLabel mapHpLabel;
 
     public GameWindow() {
-        EnemyLoader.loadEnemies("Res/enemies.json");
+        // --- INICIALIZACE OKNA A DATABÁZE ---
+        EnemyLoader.loadEnemies("Res/enemies.json"); // Načtení databáze nepřátel
         setTitle("Kill the Pyre");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setExtendedState(JFrame.MAXIMIZED_BOTH); // Start maximized
+        setExtendedState(JFrame.MAXIMIZED_BOTH); // Spuštění okna maximalizovaně přes celou obrazovku
         setResizable(true);
         setLocationRelativeTo(null);
 
         cardLayout = new CardLayout();
         mainContainer = new JPanel(cardLayout);
 
+        // --- HLAVNÍ MENU (MENU SCREEN) ---
         BackgroundPanel menuPanel = new BackgroundPanel("Res/title pozadi.jpg");
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.gridx = 0;
@@ -51,8 +59,8 @@ public class GameWindow extends JFrame {
         gbc.insets = new Insets(20, 0, 150, 0);
         menuPanel.add(playButton, gbc);
 
+        // --- PŘÍPRAVA ZÁKLADNÍCH PANELŮ ---
         JPanel charSelectPanel = createCharacterSelectPanel();
-
         JPanel mapContainer = new JPanel(new BorderLayout());
 
         JPanel combatPanel = new JPanel(new GridBagLayout());
@@ -60,19 +68,20 @@ public class GameWindow extends JFrame {
         combatLabel.setFont(new Font("Arial", Font.BOLD, 24));
         combatPanel.add(combatLabel);
 
-
+        // --- REGISTRACE OBRAZOVEK DO CARDLAYOUTU ---
         mainContainer.add(menuPanel, "MENU");
         mainContainer.add(charSelectPanel, "CHAR_SELECT");
         mainContainer.add(mapContainer, "MAP");
         mainContainer.add(combatPanel, "COMBAT");
-
-
         mainContainer.add(new GameOverScreen(this), "GAME_OVER");
 
         add(mainContainer);
-        showScreen("MENU");
+        showScreen("MENU"); // Start hry v hlavním menu
     }
 
+    /**
+     * Vytvoří obrazovku pro výběr hrdiny se zobrazením herních mechanik a statistik tříd.
+     */
     private JPanel createCharacterSelectPanel() {
         BackgroundPanel panel = new BackgroundPanel("Res/catle pozadi1.png");
 
@@ -87,6 +96,7 @@ public class GameWindow extends JFrame {
         JPanel heroesBox = new JPanel(new GridLayout(1, 2, 40, 0));
         heroesBox.setOpaque(false);
 
+        // Popisy herních mechanik jednotlivých postav
         String ashWalkerDesc = "Aggressive & Risky.\n\n"
                 + "HEAT MECHANIC:\n"
                 + "Attack cards generate Heat points, which drastically increase the damage of your subsequent attacks.\n\n"
@@ -94,7 +104,7 @@ public class GameWindow extends JFrame {
                 + "You must strategically alternate attacks with cooling skills (like Quench & Coils) that safely reduce Heat and generate Block.";
 
         String bardDesc = "Tactical & Defensive.\n\n"
-                + "RHYTHM & NOTES MECHANIC:\n"
+                + "NOTES MECHANIC:\n"
                 + "Playing cards composes songs. Each card adds an Attack or Skill note to your active bar.\n\n";
 
         heroesBox.add(createHeroOption("Ash Walker", ashWalkerDesc, "ASH_WALKER"));
@@ -109,6 +119,9 @@ public class GameWindow extends JFrame {
         return panel;
     }
 
+    /**
+     * Pomocná metoda, která sestaví grafickou kartu (box) jednoho hrdiny pro výběrovou obrazovku.
+     */
     private JPanel createHeroOption(String name, String desc, String type) {
         JPanel panel = new JPanel(new BorderLayout(10, 10));
         panel.setPreferredSize(new Dimension(480, 640));
@@ -120,6 +133,7 @@ public class GameWindow extends JFrame {
         nameLabel.setForeground(Color.WHITE);
         nameLabel.setBorder(BorderFactory.createEmptyBorder(10, 0, 5, 0));
 
+        // Škálování náhledového obrázku hrdiny se zachováním poměru stran
         String imagePath = type.equals("ASH_WALKER") ? "Res/assasin.png" : "Res/bard111.png";
         ImageIcon heroIcon = null;
         try {
@@ -182,8 +196,11 @@ public class GameWindow extends JFrame {
         return panel;
     }
 
+    /**
+     * Vytvoří instanci vybraného hrdiny a naplní jeho startovní balíček (deck) příslušnými kartami z JSONu.
+     */
     private void selectCharacter(String type) {
-        List<Card> allCards = CardLoader.loadCards("Res/cards.json");
+        List<Card> allCards = CardLoader.loadCards("Res/cards.json"); // Načtení kompletního fondu karet
         List<Card> deck = new ArrayList<>();
 
         if (type.equals("ASH_WALKER")) {
@@ -194,7 +211,6 @@ public class GameWindow extends JFrame {
             addCardsToDeck(deck, allCards, "Obsidian Dagger", 1);
             addCardsToDeck(deck, allCards, "Quench & Coils", 1);
             addCardsToDeck(deck, allCards, "Eruption", 1);
-
         } else {
             currentPlayer = new Bard("Bard", 80, 3);
             addCardsToDeck(deck, allCards, "Strike", 3);
@@ -211,6 +227,10 @@ public class GameWindow extends JFrame {
         generateAndShowMap();
     }
 
+    /**
+     * Vygeneruje novou procedurální mapu světa a nastaví scrollovací zónu,
+     * přičemž automaticky odroluje na spodní okraj, kde cesta začíná.
+     */
     private void generateAndShowMap() {
         this.currentMap = new GameMap(15, 7);
         MapPanel mapPanel = new MapPanel(this, currentMap);
@@ -220,8 +240,9 @@ public class GameWindow extends JFrame {
         scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         scrollPane.getVerticalScrollBar().setUnitIncrement(20);
 
+        // Horní lišta mapy s HP, zlatem a funkčními tlačítky
         JPanel mapControls = new JPanel(new BorderLayout());
-        mapControls.setBackground(new Color(240, 218, 181)); // Match parchment
+        mapControls.setBackground(new Color(240, 218, 181)); // Barva pergamenu
         mapControls.setBorder(BorderFactory.createEmptyBorder(5, 15, 5, 15));
 
         mapHpLabel = new JLabel("HP: " + currentPlayer.getHealth() + " / " + currentPlayer.getMaxHealth() + "💰 " + currentPlayer.getGold() + " Gold");
@@ -244,11 +265,13 @@ public class GameWindow extends JFrame {
 
         mapControls.add(buttonsPanel, BorderLayout.EAST);
 
+        // Asynchronní odrolování dolů po inicializaci layoutu
         SwingUtilities.invokeLater(() -> {
             JScrollBar vertical = scrollPane.getVerticalScrollBar();
             vertical.setValue(vertical.getMaximum());
         });
 
+        // Vyhledání mapContaineru a vložení lišty s mapou
         for (Component c : mainContainer.getComponents()) {
             if (c instanceof JPanel) {
                 JPanel p = (JPanel) c;
@@ -265,6 +288,10 @@ public class GameWindow extends JFrame {
         showScreen("MAP");
     }
 
+    /**
+     * Inicializuje bojovou scénu. Resetuje dočasné bojové stavy hrdiny, zamíchá balíček,
+     * aplikuje pasivní efekty vlastněných relikvií a lízne úvodní ruku karet.
+     */
     public void startCombat(Enemy enemy) {
         currentPlayer.setAttackedThisCombat(false);
         currentPlayer.resetBlock();
@@ -279,18 +306,21 @@ public class GameWindow extends JFrame {
         currentPlayer.getDiscardPile().clear();
         currentPlayer.shuffleDeck();
 
+        // Výpočet počtu karet k líznutí (zohlednění Bag of Preparation relikvie)
         int cardsToDraw = 5;
         if (currentPlayer.hasRelic("Bag of Preparation")) {
             cardsToDraw += 2;
         }
         currentPlayer.drawCards(cardsToDraw);
 
+        // Výpočet počáteční energie (zohlednění Lantern relikvie)
         int startEnergy = currentPlayer.getMaxEnergy();
         if (currentPlayer.hasRelic("Lantern")) {
             startEnergy += 1;
         }
         currentPlayer.setEnergy(startEnergy);
 
+        // Aplikace relikvie Anchor (Kotva)
         if (currentPlayer.hasRelic("Anchor")) {
             currentPlayer.addBlock(10);
         }
@@ -301,18 +331,19 @@ public class GameWindow extends JFrame {
         showScreen("COMBAT");
     }
 
-
     public void showWinScreen() {
         WinScreen winScreen = new WinScreen(this, currentPlayer);
         mainContainer.add(winScreen, "WIN_SCREEN");
         showScreen("WIN_SCREEN");
     }
 
-
     public void showGameOverScreen() {
         showScreen("GAME_OVER");
     }
 
+    /**
+     * Otevře bezrežimové (non-modal) dialogové okno s přehledem mapy světa.
+     */
     public void showMapDialog() {
         if (currentMap == null) return;
 
@@ -338,6 +369,9 @@ public class GameWindow extends JFrame {
         });
     }
 
+    /**
+     * Otevře dialogové okno s mřížkou všech karet, které hráč aktuálně vlastní v celém decku.
+     */
     public void showDeckDialog() {
         if (currentPlayer == null) return;
 
@@ -358,6 +392,9 @@ public class GameWindow extends JFrame {
         dialog.setVisible(true);
     }
 
+    /**
+     * Otevře modální dialog kováře u ohniště a umožní vylepšit (upgrade) vybranou kartu.
+     */
     public void showSmithDialog(java.util.function.Consumer<Card> onUpgrade) {
         List<Card> upgradable = new ArrayList<>();
         for (Card c : currentPlayer.getDeck()) {
@@ -390,6 +427,9 @@ public class GameWindow extends JFrame {
         dialog.setVisible(true);
     }
 
+    /**
+     * Pomocná metoda pro vyhledání šablony karty podle jména a její naklonování do balíčku.
+     */
     private void addCardsToDeck(List<Card> deck, List<Card> allCards, String name, int count) {
         for (Card c : allCards) {
             if (c.getName().equals(name)) {
@@ -399,12 +439,18 @@ public class GameWindow extends JFrame {
         }
     }
 
+    /**
+     * Aktualizuje textové informace o HP a zlaťácích na horní liště mapy.
+     */
     public void updateMapHpLabel() {
         if (mapHpLabel != null) {
             mapHpLabel.setText("HP:"+currentPlayer.getHealth()+"/"+currentPlayer.getMaxHealth()+" | "+"GOLD: "+currentPlayer.getGold());
         }
     }
 
+    /**
+     * Přepne aktivní obrazovku CardLayoutu na základě zadaného klíče (ID screeny).
+     */
     public void showScreen(String screenName) {
         if (screenName.equals("MAP")) {
             updateMapHpLabel();
@@ -424,6 +470,9 @@ public class GameWindow extends JFrame {
         showScreen("SHOP");
     }
 
+    /**
+     * Otevře modální dialog v obchodě nebo při události pro trvalé odstranění (remove) vybrané karty z balíčku.
+     */
     public void showRemoveDialog(java.util.function.Consumer<Card> onRemove) {
         JDialog dialog = new JDialog(this, "Select a card to Remove", true);
         DeckPanel deckPanel = new DeckPanel(currentPlayer.getDeck(), card -> {

@@ -4,7 +4,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+/**
+ * Třída reprezentující nepřítele v boji.
+ * Rozšiřuje obecnou entitu a přidává chování specifické pro UI a AI –
+ * správu záměrů (Intents) a náhodný výběr útoků či obran na základě zadaných vah.
+ */
 public class Enemy extends Entity {
+
+    /** Výčet typů záměrů, které se zobrazují hráči nad hlavou nepřítele. */
     public enum IntentType {
         ATTACK, BLOCK, DEBUFF
     }
@@ -18,6 +25,7 @@ public class Enemy extends Entity {
     private String intentDescription;
     private String debuffType;
 
+    /** Seznam všech dostupných akcí (útoky, debuffy, obrana), které nepřítel umí provést. */
     private List<EnemyMove> moves;
 
 
@@ -28,21 +36,33 @@ public class Enemy extends Entity {
         this.moves = new java.util.ArrayList<>();
     }
 
-
+    /**
+     * Klonovací konstruktor (Template pattern).
+     * Používá se pro vytvoření konkrétní instance nepřítele ze šablony načtené např. z JSONu,
+     * přičemž mu náhodně vypočítá životy v rozmezí min a max HP.
+     */
     public Enemy(Enemy template) {
         super(template.getName(), calculateHp(template.getMinHp(), template.getMaxHp()));
         this.id = template.getId();
         this.pool = template.getPool();
         this.moves = template.getMoves();
         this.imagePath = template.getImagePath();
-        decideIntent();
+        decideIntent(); // Hned při zrodu si vybere svůj první záměr
     }
 
+    /**
+     * Pomocná metoda pro výpočet náhodného počtu životů v daném rozsahu.
+     */
     private static int calculateHp(int min, int max) {
         if (max <= min) return min;
         return min + new Random().nextInt((max - min) + 1);
     }
 
+    /**
+     * AI nepřítele: Vybere náhodný tah ze seznamu 'moves' na základě jejich vah (Chance Weight).
+     * Následně spočítá náhodnou hodnotu (v rozsahu min a max daného tahu) a připraví
+     * textový popis a typ záměru (Intent) pro zobrazení v uživatelském rozhraní.
+     */
     public void decideIntent() {
         if (moves == null || moves.isEmpty()) return;
 
@@ -52,6 +72,7 @@ public class Enemy extends Entity {
             totalWeight += move.getChanceWeight();
         }
 
+        // Ruletový výběr tahu podle vah
         int roll = rand.nextInt(totalWeight);
         int currentWeight = 0;
         EnemyMove selectedMove = moves.get(0);
@@ -64,11 +85,13 @@ public class Enemy extends Entity {
             }
         }
 
+        // Výpočet výsledné hodnoty akce (např. velikost poškození) v daném rozsahu tahu
         intentValue = selectedMove.getMinVal();
         if (selectedMove.getMaxVal() > selectedMove.getMinVal()) {
             intentValue += rand.nextInt((selectedMove.getMaxVal() - selectedMove.getMinVal()) + 1);
         }
 
+        // Sestavení záměru pro zobrazení hráči
         switch (selectedMove.getType()) {
             case "ATTACK":
                 currentIntent = IntentType.ATTACK;
@@ -91,6 +114,10 @@ public class Enemy extends Entity {
         }
     }
 
+    /**
+     * Vrací upravené poškození nepřítele. Pokud je nepřítel oslaben (Weak),
+     * jeho útok dává pouze 75 % základního poškození.
+     */
     private int getCalculatedDamage(int baseDamage) {
         if (getWeakTurns() > 0) {
             return (int)(baseDamage * 0.75);
@@ -98,6 +125,10 @@ public class Enemy extends Entity {
         return baseDamage;
     }
 
+    /**
+     * Provede aktuálně naplánovaný záměr vůči hráči (útok, zisk bloku, nebo aplikaci debuffů).
+     * Na konci tahu sníží trvání svých negativních statusů a vybere si nový záměr na další kolo.
+     */
     public void takeTurn(Player player) {
         this.resetBlock();
         System.out.println(name + " performs: " + intentDescription);
@@ -114,11 +145,12 @@ public class Enemy extends Entity {
             }
         }
 
+        // Správa statusů a příprava na další kolo
         decrementStatuses();
         decideIntent();
     }
 
-    // 🌟 UPRAVENÉ SETTERY A GETTERY PRO GSON
+    // Settery a gettery pro správnou serializaci/deserializaci (GSON) a UI...
     public void setId(String id) { this.id = id; }
     public String getId() { return id; }
 
@@ -128,13 +160,9 @@ public class Enemy extends Entity {
     public void setMinHp(int minHp) { this.minHp = minHp; }
     public int getMinHp() { return minHp; }
 
+    public void setMaxHp(int maxHp) { this.maxHp = maxHp; }
+    public int getMaxHp() { return getMaxHealth(); }
 
-    public void setMaxHp(int maxHp) {
-        this.maxHp = maxHp;
-    }
-    public int getMaxHp() {
-        return getMaxHealth();
-    }
     public void setImagePath(String imagePath) { this.imagePath = imagePath; }
     public String getImagePath() { return imagePath; }
 
