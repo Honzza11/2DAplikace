@@ -13,19 +13,6 @@
     ]
   },
   {
-    "id": "elite_slime",
-    "name": "Elite Slime",
-    "pool": "ELITE",
-    "minHp": 80,
-    "maxHp": 95,
-    "imagePath": "Res/elite_slime.png",
-    "moves": [
-      { "type": "ATTACK", "chanceWeight": 50, "minVal": 12, "maxVal": 18 },
-      { "type": "BLOCK", "chanceWeight": 25, "minVal": 10, "maxVal": 15 },
-      { "type": "WEAK", "chanceWeight": 25, "minVal": 2, "maxVal": 3 }
-    ]
-  },
-  {
     "id": "the_pyre_avatar",
     "name": "Avatar of Pyre",
     "pool": "BOSS",

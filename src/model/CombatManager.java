@@ -71,7 +71,6 @@ public class CombatManager {
         System.out.println("\n--- Enemy turn (" + enemy.getName() + ") ---");
         enemy.resetBlock();
         enemy.takeTurn(player);
-
         // Přechod zpět na tah hráče
         turnCount++;
         isPlayerTurn = true;

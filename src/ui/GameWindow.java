@@ -500,10 +500,4 @@ public class GameWindow extends JFrame {
         mainContainer.add(rewardPanel, "REWARD");
         showScreen("REWARD");
     }
-
-    public void showRandomEvent() {
-        RandomEventPanel eventPanel = new RandomEventPanel(this, currentPlayer);
-        mainContainer.add(eventPanel, "EVENT");
-        showScreen("EVENT");
-    }
 }

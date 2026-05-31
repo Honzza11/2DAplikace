@@ -53,7 +53,7 @@
     "type": "ATTACK",
     "description": "Deal 8 damage. Apply 1 Vulnerable.",
     "damage": 8,
-    "apply_vulnerable": 1,
+    "apply_vulnerable": 0,
     "heroClass": "Bard",
     "upgrade_damage": 3,
     "upgrade_description": "Deal 11 damage. Apply 1 Vulnerable."
@@ -142,7 +142,7 @@
     "type": "SKILL",
     "description": "Gain 16 Block. Apply 2 Weak.",
     "block": 16,
-    "apply_weak": 2,
+    "apply_weak": 1,
     "heroClass": "Bard",
     "upgrade_block": 4,
     "upgrade_description": "Gain 20 Block. Apply 2 Weak."
@@ -187,7 +187,7 @@
     "cost": 1,
     "type": "SKILL",
     "description": "Apply 2 Vulnerable.",
-    "apply_vulnerable": 2,
+    "apply_vulnerable": 1,
     "heroClass": "Neutral",
     "upgrade_apply_vulnerable": 1,
     "upgrade_description": "Apply 3 Vulnerable."
@@ -198,7 +198,7 @@
     "cost": 1,
     "type": "SKILL",
     "description": "Apply 2 Weak.",
-    "apply_weak": 2,
+    "apply_weak": 1,
     "heroClass": "Neutral",
     "upgrade_apply_weak": 1
   },
@@ -262,7 +262,7 @@
     "damage": 10,
     "condition_heat_max": 5,
     "condition_bonus_damage": 14,
-    "apply_vulnerable": 2,
+    "apply_vulnerable": 1,
     "heroClass": "AshWalker",
     "upgrade_condition_bonus_damage": 6,
     "upgrade_apply_vulnerable": 1,

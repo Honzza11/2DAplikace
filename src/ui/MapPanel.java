@@ -4,7 +4,7 @@ import model.GameMap;
 import model.MapNode;
 import model.NodeType;
 import model.Enemy;
-import model.EnemyLoader; // 🌟 Přidán import loaderu
+import model.EnemyLoader;
 
 import javax.swing.*;
 import java.awt.*;
@@ -12,6 +12,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
 import java.util.List;
+import java.util.Random;
 
 /**
  * Panel zodpovědný za zobrazení a interakci s herní mapou.
@@ -85,6 +86,50 @@ public class MapPanel extends JPanel {
                 repaint();
             }
         });
+    }
+
+    /**
+     * Okamžitě vybere náhodnou obrazovku (místnost) a přepne na ni.
+     * Nahrazuje dřívější komplexní RandomEventPanel.
+     */
+    private void triggerMysteryNode() {
+        Random random = new Random();
+        int roll = random.nextInt(5); // Vygeneruje číslo od 0 do 4
+
+        switch (roll) {
+            case 0:
+                System.out.println("Mystery node -> Regular Enemy");
+                // gameWindow.showScreen("ENEMY");
+                // Musíme vygenerovat nepřítele a začít souboj, nestačí jen ukázat obrazovku
+                Enemy normalTemplate = EnemyLoader.getRandomEnemyByPool("NORMAL");
+                if (normalTemplate != null) {
+                    gameWindow.startCombat(new Enemy(normalTemplate));
+                } else {
+                    gameWindow.startCombat(new Enemy("Mystery Slime", 50));
+                }
+                break;
+            case 1:
+                System.out.println("Mystery node -> Elite Enemy");
+                Enemy eliteTemplate = EnemyLoader.getRandomEnemyByPool("ELITE");
+                if (eliteTemplate != null) {
+                    gameWindow.startCombat(new Enemy(eliteTemplate));
+                } else {
+                    gameWindow.startCombat(new Enemy("Mystery Elite", 100));
+                }
+                break;
+            case 2:
+                System.out.println("Mystery node -> Shop");
+                gameWindow.showShop();
+                break;
+            case 3:
+                System.out.println("Mystery node -> Rest Site");
+                gameWindow.showRestSite();
+                break;
+            case 4:
+                System.out.println("Mystery node -> Treasure Room");
+                gameWindow.showTreasureReward();
+                break;
+        }
     }
 
     /**
@@ -217,7 +262,7 @@ public class MapPanel extends JPanel {
                             } else if (node.getType() == NodeType.TREASURE) {
                                 gameWindow.showTreasureReward();
                             } else if (node.getType() == NodeType.EVENT) {
-                                gameWindow.showRandomEvent();
+                                triggerMysteryNode();
                             } else if (node.getType() == NodeType.REST) {
                                 gameWindow.showRestSite();
                             } else if (node.getType() == NodeType.SHOP) {
