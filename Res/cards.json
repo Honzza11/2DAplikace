@@ -176,12 +176,10 @@
     "name": "Echo Verse",
     "cost": 1,
     "type": "POWER",
-    "description": "Gain 1 Energy. Echo: replay this card at the start of your next turn.",
-    "energy_gain": 1,
-    "echo": 1,
+    "description": "Gain 2 Energy.",
+    "energy_gain": 2,
     "heroClass": "Bard",
-    "upgrade_energy_gain": 1,
-    "upgrade_echo": 0
+    "upgrade_energy_gain": 1
   },
   {
     "id": "expose",
